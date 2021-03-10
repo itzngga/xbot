@@ -1,0 +1,25 @@
+{
+    "apikeys": {
+        "vthear": "",
+        "cekresi": [],
+        "keepsaveit": [],
+        "bitly": "",
+        "genius": "",
+        "tech": ""
+    },
+    "vcard": {
+        "cs": {
+            "displayName": "XyZ Costumer Service",
+            "vcard": "BEGIN:VCARD\nVERSION:3.0\nN:;XyZ Costumer Service;;;\nFN:XyZ Costumer Service\nitem1.TEL;waid=628568970792:+62 856-8970-792\nitem1.X-ABLabel:Ponsel\nX-WA-BIZ-DESCRIPTION:Layanan user XyZ BOT\nX-WA-BIZ-NAME:XyZ Costumer Service\nEND:VCARD"
+        },
+        "owner": {
+            "displayName": "ItzNgga",
+            "vcard": "BEGIN:VCARD\nVERSION:3.0\nN:H;ItzNgga;;;\nFN:ItzNgga\nitem1.TEL;waid=6281297980063:+62 812-9798-0063\nitem1.X-ABLabel:Ponsel\nitem2.EMAIL;type=INTERNET:rangganak094@gmail.com\nitem2.X-ABLabel:null\nEND:VCARD"
+        }
+    },
+    "secret": "",
+    "ytCookie": "",
+    "scdl": "",
+    "ytIdentity": "",
+    "igCookie": ""
+}

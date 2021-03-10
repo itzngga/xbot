@@ -1,0 +1,798 @@
+{
+  "help": {
+    "count": 0,
+    "type": "member"
+  },
+  "kapan": {
+    "count": 0,
+    "type": "member"
+  },
+  "siapa": {
+    "count": 0,
+    "type": "member"
+  },
+  "apakah": {
+    "count": 0,
+    "type": "member"
+  },
+  "cmd": {
+    "count": 0,
+    "type": "member"
+  },
+  "custom cmd": {
+    "count": 0,
+    "type": "admin"
+  },
+  "mute": {
+    "count": 0,
+    "type": "member"
+  },
+  "unmute": {
+    "count": 0,
+    "type": "member"
+  },
+  "bug": {
+    "count": 0,
+    "type": "member"
+  },
+  "feature": {
+    "count": 0,
+    "type": "member"
+  },
+  "sticker": {
+    "count": 0,
+    "type": "member"
+  },
+  "ytmp4": {
+    "count": 0,
+    "type": "member"
+  },
+  "donasi": {
+    "count": 0,
+    "type": "member"
+  },
+  "bahasa": {
+    "count": 0,
+    "type": "member"
+  },
+  "list": {
+    "count": 0,
+    "type": "member"
+  },
+  "meme": {
+    "count": 0,
+    "type": "member"
+  },
+  "me": {
+    "count": 0,
+    "type": "member"
+  },
+  "food": {
+    "count": 0,
+    "type": "member"
+  },
+  "join": {
+    "count": 0,
+    "type": "member"
+  },
+  "bacot": {
+    "count": 0,
+    "type": "member"
+  },
+  "delete": {
+    "count": 0,
+    "type": "member"
+  },
+  "nulis": {
+    "count": 0,
+    "type": "member"
+  },
+  "ocr": {
+    "count": 0,
+    "type": "member"
+  },
+  "translate": {
+    "count": 0,
+    "type": "member"
+  },
+  "qnime": {
+    "count": 0,
+    "type": "member"
+  },
+  "speed": {
+    "count": 0,
+    "type": "member"
+  },
+  "qrcode": {
+    "count": 0,
+    "type": "member"
+  },
+  "igstalk": {
+    "count": 0,
+    "type": "member"
+  },
+  "add": {
+    "count": 0,
+    "type": "member"
+  },
+  "kick": {
+    "count": 0,
+    "type": "member"
+  },
+  "glist": {
+    "count": 0,
+    "type": "admin"
+  },
+  "yts": {
+    "count": 0,
+    "type": "member"
+  },
+  "exec": {
+    "count": 0,
+    "type": "admin"
+  },
+  "lirik": {
+    "count": 0,
+    "type": "member"
+  },
+  "ban": {
+    "count": 0,
+    "type": "admin"
+  },
+  "unban": {
+    "count": 0,
+    "type": "admin"
+  },
+  "gtts": {
+    "count": 0,
+    "type": "member"
+  },
+  "lang": {
+    "count": 0,
+    "type": "member"
+  },
+  "cmdlist": {
+    "count": 0,
+    "type": "member"
+  },
+  "retry": {
+    "count": 0,
+    "type": "member"
+  },
+  "delcmd": {
+    "count": 0,
+    "type": "member"
+  },
+  "wikipedia": {
+    "count": 0,
+    "type": "member"
+  },
+  "cekresi": {
+    "count": 0,
+    "type": "member"
+  },
+  "quran": {
+    "count": 0,
+    "type": "member"
+  },
+  "surah": {
+    "count": 0,
+    "type": "member"
+  },
+  "bmkg": {
+    "count": 0,
+    "type": "member"
+  },
+  "brainly": {
+    "count": 0,
+    "type": "member"
+  },
+  "google": {
+    "count": 0,
+    "type": "member"
+  },
+  "cuaca": {
+    "count": 0,
+    "type": "member"
+  },
+  "ttp": {
+    "count": 0,
+    "type": "member"
+  },
+  "ttd": {
+    "count": 0,
+    "type": "member"
+  },
+  "attp": {
+    "count": 0,
+    "type": "member"
+  },
+  "kbbi": {
+    "count": 0,
+    "type": "member"
+  },
+  "everyone": {
+    "count": 0,
+    "type": "member"
+  },
+  "status": {
+    "count": 0,
+    "type": "member"
+  },
+  "bc": {
+    "count": 0,
+    "type": "admin"
+  },
+  "leave": {
+    "count": 0,
+    "type": "member"
+  },
+  "bitly": {
+    "count": 0,
+    "type": "member"
+  },
+  "bot": {
+    "count": 0,
+    "type": "admin"
+  },
+  "chat": {
+    "count": 0,
+    "type": "member"
+  },
+  "creator": {
+    "count": 0,
+    "type": "member"
+  },
+  "ig": {
+    "count": 0,
+    "type": "member"
+  },
+  "twitter": {
+    "count": 0,
+    "type": "member"
+  },
+  "fb": {
+    "count": 0,
+    "type": "member"
+  },
+  "ytmp3": {
+    "count": 0,
+    "type": "member"
+  },
+  "imp3": {
+    "count": 0,
+    "type": "member"
+  },
+  "yt": {
+    "count": 0,
+    "type": "member"
+  },
+  "extract": {
+    "count": 0,
+    "type": "member"
+  },
+  "likee": {
+    "count": 0,
+    "type": "member"
+  },
+  "news": {
+    "count": 0,
+    "type": "member"
+  },
+  "kucing": {
+    "count": 0,
+    "type": "member"
+  },
+  "wallpaper": {
+    "count": 0,
+    "type": "member"
+  },
+  "corona": {
+    "count": 0,
+    "type": "member"
+  },
+  "quoteit": {
+    "count": 0,
+    "type": "member"
+  },
+  "quote": {
+    "count": 0,
+    "type": "member"
+  },
+  "compress": {
+    "count": 0,
+    "type": "member"
+  },
+  "wait": {
+    "count": 0,
+    "type": "member"
+  },
+  "anime": {
+    "count": 0,
+    "type": "member"
+  },
+  "simsimi": {
+    "count": 0,
+    "type": "member"
+  },
+  "salam": {
+    "count": 0,
+    "type": "admin"
+  },
+  "alquran": {
+    "count": 0,
+    "type": "member"
+  },
+  "resep": {
+    "count": 0,
+    "type": "member"
+  },
+  "tiktok": {
+    "count": 0,
+    "type": "member"
+  },
+  "quality": {
+    "count": 0,
+    "type": "member"
+  },
+  "mimic": {
+    "count": 0,
+    "type": "member"
+  },
+  "arch": {
+    "count": 0,
+    "type": "member"
+  },
+  "countpremi": {
+    "count": 0,
+    "type": "admin"
+  },
+  "feedback": {
+    "count": 0,
+    "type": "member"
+  },
+  "image": {
+    "count": 0,
+    "type": "member"
+  },
+  "ping": {
+    "count": 0,
+    "type": "member"
+  },
+  "cek": {
+    "count": 0,
+    "type": "member"
+  },
+  "refrence": {
+    "count": 0,
+    "type": "member"
+  },
+  "harta": {
+    "count": 0,
+    "type": "member"
+  },
+  "tahta": {
+    "count": 0,
+    "type": "member"
+  },
+  "cloud": {
+    "count": 0,
+    "type": "member"
+  },
+  "menu": {
+    "count": 0,
+    "type": "member"
+  },
+  "toimg": {
+    "count": 0,
+    "type": "member"
+  },
+  "inspect": {
+    "count": 0,
+    "type": "member"
+  },
+  "stiker": {
+    "count": 0,
+    "type": "member"
+  },
+  "suggest": {
+    "count": 0,
+    "type": "admin"
+  },
+  "changelog": {
+    "count": 0,
+    "type": "member"
+  },
+  "like": {
+    "count": 0,
+    "type": "member"
+  },
+  "owner": {
+    "count": 0,
+    "type": "member"
+  },
+  "tulis": {
+    "count": 0,
+    "type": "member"
+  },
+  "quotes": {
+    "count": 0,
+    "type": "member"
+  },
+  "twt": {
+    "count": 0,
+    "type": "member"
+  },
+  "triggered": {
+    "count": 0,
+    "type": "member"
+  },
+  "ss": {
+    "count": 0,
+    "type": "member"
+  },
+  "mine": {
+    "count": 0,
+    "type": "member"
+  },
+  "deepfry": {
+    "count": 0,
+    "type": "member"
+  },
+  "memegen": {
+    "count": 0,
+    "type": "member"
+  },
+  "thuglife": {
+    "count": 0,
+    "type": "member"
+  },
+  "burn": {
+    "count": 0,
+    "type": "member"
+  },
+  "tobe": {
+    "count": 0,
+    "type": "member"
+  },
+  "memegen2": {
+    "count": 0,
+    "type": "member"
+  },
+  "filter": {
+    "count": 0,
+    "type": "admin"
+  },
+  "count": {
+    "count": 10,
+    "type": "admin"
+  },
+  "gameLimit": {
+    "count": 0,
+    "type": "member"
+  },
+  "math": {
+    "count": 0,
+    "type": "member"
+  },
+  "chop": {
+    "count": 0,
+    "type": "member"
+  },
+  "dungeon": {
+    "count": 0,
+    "type": "member"
+  },
+  "dig": {
+    "count": 0,
+    "type": "member"
+  },
+  "fight": {
+    "count": 0,
+    "type": "member"
+  },
+  "hunt": {
+    "count": 0,
+    "type": "member"
+  },
+  "thief": {
+    "count": 0,
+    "type": "member"
+  },
+  "trade": {
+    "count": 0,
+    "type": "member"
+  },
+  "sholat": {
+    "count": 0,
+    "type": "member"
+  },
+  "wasted": {
+    "count": 0,
+    "type": "member"
+  },
+  "sha1": {
+    "count": 0,
+    "type": "member"
+  },
+  "wanted": {
+    "count": 0,
+    "type": "member"
+  },
+  "music": {
+    "count": 0,
+    "type": "member"
+  },
+  "rainbow": {
+    "count": 0,
+    "type": "member"
+  },
+  "getpic": {
+    "count": 0,
+    "type": "member"
+  },
+  "fuse": {
+    "count": 0,
+    "type": "member"
+  },
+  "fp": {
+    "count": 0,
+    "type": "member"
+  },
+  "md5": {
+    "count": 0,
+    "type": "member"
+  },
+  "gplay": {
+    "count": 0,
+    "type": "member"
+  },
+  "debug": {
+    "count": 0,
+    "type": "member"
+  },
+  "sha256": {
+    "count": 0,
+    "type": "member"
+  },
+  "imdb": {
+    "count": 0,
+    "type": "member"
+  },
+  "log": {
+    "count": 0,
+    "type": "admin"
+  },
+  "imdbs": {
+    "count": 0,
+    "type": "member"
+  },
+  "accept": {
+    "count": 0,
+    "type": "member"
+  },
+  "reply": {
+    "count": 0,
+    "type": "member"
+  },
+  "reverse": {
+    "count": 0,
+    "type": "member"
+  },
+  "sha3": {
+    "count": 0,
+    "type": "member"
+  },
+  "a-harta": {
+    "count": 0,
+    "type": "member"
+  },
+  "fire": {
+    "count": 0,
+    "type": "member"
+  },
+  "sha512": {
+    "count": 0,
+    "type": "member"
+  },
+  "mock": {
+    "count": 0,
+    "type": "member"
+  },
+  "youtube": {
+    "count": 0,
+    "type": "member"
+  },
+  "unsend": {
+    "count": 0,
+    "type": "member"
+  },
+  "getobj": {
+    "count": 0,
+    "type": "member"
+  },
+  "autoread": {
+    "count": 0,
+    "type": "member"
+  },
+  "hidetag": {
+    "count": 0,
+    "type": "member"
+  },
+  "waitfor": {
+    "count": 0,
+    "type": "member"
+  },
+  "distord": {
+    "count": 0,
+    "type": "member"
+  },
+  "destroy": {
+    "count": 0,
+    "type": "member"
+  },
+  "bass": {
+    "count": 0,
+    "type": "member"
+  },
+  "temp": {
+    "count": 0,
+    "type": "member"
+  },
+  "fitnah": {
+    "count": 0,
+    "type": "member"
+  },
+  "decrypt": {
+    "count": 0,
+    "type": "member"
+  },
+  "ytsearch": {
+    "count": 0,
+    "type": "member"
+  },
+  "quiz": {
+    "count": 0,
+    "type": "member"
+  },
+  "textpro": {
+    "count": 0,
+    "type": "member"
+  },
+  "photofunia": {
+    "count": 0,
+    "type": "member"
+  },
+  "facebook": {
+    "count": 0,
+    "type": "member"
+  },
+  "instagram": {
+    "count": 0,
+    "type": "member"
+  },
+  "copet": {
+    "count": 0,
+    "type": "member"
+  },
+  "group": {
+    "count": 0,
+    "type": "member"
+  },
+  "invite": {
+    "count": 0,
+    "type": "member"
+  },
+  "onlyadmin": {
+    "count": 0,
+    "type": "member"
+  },
+  "subject": {
+    "count": 0,
+    "type": "member"
+  },
+  "cak": {
+    "count": 0,
+    "type": "member"
+  },
+  "fakereply": {
+    "count": 0,
+    "type": "member"
+  },
+  "admin": {
+    "count": 0,
+    "type": "member"
+  },
+  "unadmin": {
+    "count": 0,
+    "type": "member"
+  },
+  "slots": {
+    "count": 0,
+    "type": "member"
+  },
+  "tictactoe": {
+    "count": 0,
+    "type": "member"
+  },
+  "caklontong": {
+    "count": 0,
+    "type": "member"
+  },
+  "detect": {
+    "count": 0,
+    "type": "member"
+  },
+  "8d": {
+    "count": 0,
+    "type": "member"
+  },
+  "eval": {
+    "count": 0,
+    "type": "member"
+  },
+  "fisheye": {
+    "count": 0,
+    "type": "member"
+  },
+  "prefix": {
+    "count": 0,
+    "type": "member"
+  },
+  "online": {
+    "count": 0,
+    "type": "member"
+  },
+  "captha": {
+    "count": 0,
+    "type": "member"
+  },
+  "upstory": {
+    "count": 0,
+    "type": "member"
+  },
+  "ss2": {
+    "count": 0,
+    "type": "member"
+  },
+  "upstatus": {
+    "count": 0,
+    "type": "member"
+  },
+  "public": {
+    "count": 0,
+    "type": "member"
+  },
+  "slist": {
+    "count": 0,
+    "type": "member"
+  },
+  "s": {
+    "count": 0,
+    "type": "member"
+  },
+  "sinfo": {
+    "count": 0,
+    "type": "member"
+  },
+  "supdate": {
+    "count": 0,
+    "type": "member"
+  },
+  "ssave": {
+    "count": 0,
+    "type": "member"
+  },
+  "info": {
+    "count": 0,
+    "type": "member"
+  },
+  "antivirtex": {
+    "count": 0,
+    "type": "member"
+  },
+  "profile": {
+    "count": 0,
+    "type": "member"
+  }
+}
