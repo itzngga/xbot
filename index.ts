@@ -81,6 +81,9 @@ class main extends WAConnection {
       }
     });
   }
+  addContact(jid: string){
+    return this.contactAddOrGet(jid)
+  }
   generateFakeReply(fakeText: string) {
     return {
       key: {

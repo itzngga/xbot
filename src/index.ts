@@ -16,7 +16,6 @@ import gplay from 'google-play-scraper';
 import file_type from 'file-type';
 import query_string from 'query-string';
 import normalize_url from 'normalize-url';
-import itech_wrapper from 'itech-wrapper';
 import ffmpeg from 'fluent-ffmpeg';
 const scrap = new Scrap();
 const games = new Game();
@@ -96,7 +95,7 @@ const config = constant.config;
 const arryOfWords = constant.arryOfWords;
 const publicJid = new Set(constant.publicJid);
 const textpro = constant.textpro;
-const itech = itech_wrapper.key(config.apikeys.tech)
+const itech = require('itech-wrapper').key(config.apikeys.tech)
 import {
   WAMessage,
   MessageType,
@@ -108,7 +107,8 @@ import {
 } from '@adiwajshing/baileys';
 import {clear} from 'console';
 import {Readable} from 'stream';
-import {db} from '../types/db';
+import * as jsondb from '../types/db';
+const db = jsondb.db
 const {
   text,
   extendedText,
@@ -563,15 +563,10 @@ export async function handler(message: WAMessage): Promise<any> {
       }
     };
     const pushname = (target?: string) => {
-      let targets: any = target || serial;
-      const formated = targets.replace(/@.+/, '');
-      const name = client.contacts[targets] || {
-        notify: formated,
-        name: formated,
-        vname: formated,
-      };
-      return name.name! || name.vname! || name.notify!;
-    };
+        let targets: string = target || serial;
+        let v = targets === '0@s.whatsapp.net' ? {jid: targets, vname: 'WhatsApp'} : targets === client.user.jid ? client.user : client.addContact(targets) 
+        return v.name || v.vname || v.notify || libphonenumber('+' + v.jid.replace('@s.whatsapp.net', '')).getNumber('international')
+    }
     const mentionedJidList = () => {
       if (!is_undefined(quotedMsgObj().mentionedJid)) {
         return quotedMsgObj().mentionedJid;

@@ -1,6 +1,6 @@
 {
   "help": {
-    "count": 83,
+    "count": 85,
     "type": "member"
   },
   "kapan": {
@@ -64,7 +64,7 @@
     "type": "member"
   },
   "me": {
-    "count": 52,
+    "count": 53,
     "type": "member"
   },
   "food": {
@@ -388,7 +388,7 @@
     "type": "member"
   },
   "inspect": {
-    "count": 11,
+    "count": 23,
     "type": "member"
   },
   "stiker": {
@@ -608,7 +608,7 @@
     "type": "member"
   },
   "getobj": {
-    "count": 117,
+    "count": 120,
     "type": "member"
   },
   "autoread": {
@@ -720,7 +720,7 @@
     "type": "member"
   },
   "detect": {
-    "count": 1,
+    "count": 7,
     "type": "member"
   },
   "8d": {
@@ -728,7 +728,7 @@
     "type": "member"
   },
   "eval": {
-    "count": 97,
+    "count": 98,
     "type": "member"
   },
   "fisheye": {
@@ -760,7 +760,7 @@
     "type": "member"
   },
   "public": {
-    "count": 18,
+    "count": 22,
     "type": "member"
   },
   "slist": {
