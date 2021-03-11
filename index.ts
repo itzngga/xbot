@@ -15,6 +15,7 @@ import {unSendHandler, handler} from './src';
 import regexParser from 'regex-parser';
 import moment from 'moment';
 import {setting, fakeReplyBase64, publicJid} from './types';
+import {db} from './types/db';
 const fs: any = require('fs-extra');
 
 class main extends WAConnection {
@@ -93,22 +94,20 @@ class main extends WAConnection {
             'https://mmg.whatsapp.net/d/f/AhRn5_nFM3RbHBizrcFUfmrN2laPWbHHj1PMeqOqwx8r.enc',
           mimetype: 'image/jpeg',
           caption: fakeText,
-          fileSha256: uInt8('GiXpQFb9qHneHjGQTFFbNeJMZ8U5zmPhAjKWTOx7jAI='),
+          fileSha256: 'GiXpQFb9qHneHjGQTFFbNeJMZ8U5zmPhAjKWTOx7jAI=',
           fileLength: 28742,
           height: 512,
           width: 512,
-          mediaKey: uInt8('UdWzxBmXlCBuHNImNXB2UFAw+GT04CzxbucCp/duiYg='),
-          fileEncSha256: uInt8('5HnGj+12PjaglwnPV0f7wmBI8YPzIEM8pKzc48GzNCg='),
+          mediaKey: 'UdWzxBmXlCBuHNImNXB2UFAw+GT04CzxbucCp/duiYg=',
+          fileEncSha256: '5HnGj+12PjaglwnPV0f7wmBI8YPzIEM8pKzc48GzNCg=',
           directPath:
             '/v/t62.7118-24/17614527_2526091537698863_5247917891246363081_n.enc?oh=22f044b9bf4c2067c022f100ba4eb806&oe=606A7E38',
           jpegThumbnail: fakeReplyBase64,
-          scansSidecar: uInt8(
-            'p7FGNd6R/E5fgL0NkS9aiOzy24PgFs+sIw5QWyRW5QavTBxv6rAzcg=='
-          ),
+          scansSidecar:
+            'p7FGNd6R/E5fgL0NkS9aiOzy24PgFs+sIw5QWyRW5QavTBxv6rAzcg==',
         },
+        status: WA_MESSAGE_STATUS_TYPE.READ,
       },
-      messageTimestamp: moment().unix(),
-      status: WA_MESSAGE_STATUS_TYPE.READ,
     } as any;
   }
   generateStory(status: any): WAMessage {
@@ -269,8 +268,7 @@ class main extends WAConnection {
 }
 const client = new main();
 client.gameEvent.setMaxListeners(0);
-fs.existsSync('./xyz.data.json') &&
-  client.loadAuthInfo('./xyz.data.json');
+fs.existsSync('../xyz.data.json') && client.loadAuthInfo('../xyz.data.json');
 client.connect().then(() => {
   const authInfo = client.base64EncodedAuthInfo();
   fs.writeFileSync('./xyz.data.json', JSON.stringify(authInfo));
@@ -278,7 +276,7 @@ client.connect().then(() => {
 client.on('open', () => {
   if (!publicJid.has(client.user.jid)) {
     publicJid.add(client.user.jid);
-    fs.writeJSONSync('./json/public.json', Array.from(publicJid));
+    db.push('/publicJid', Array.from(publicJid), true);
   }
 });
 client.on('message-update', msg => unSendHandler(msg));
@@ -295,4 +293,4 @@ client.on('chat-update', chat => {
   if (client.waitmsg.has(serial!)) client.gameEvent.emit(serial!, msg);
   return handler(msg);
 });
-export default client
+export default client;

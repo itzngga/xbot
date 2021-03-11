@@ -1,12 +1,13 @@
+import sharp from 'sharp';
 import moment from 'moment';
 import pretty_bytes from 'pretty-bytes';
 import {sticker, setting} from '../types';
+import {db} from '../types/db';
 const fs: any = require('fs-extra');
-const sharp: any = require('sharp');
 const {spawn}: any = require('child_process');
 const debugWM = '*「 STICKER 」*\n\n';
 
-const save = () => fs.writeJSONSync('./sticker/sticker.json', sticker);
+const save = () => db.push('/sticker', sticker, true);
 const isExist = (name: string) => {
   if (sticker.hasOwnProperty(name)) {
     return true;
@@ -22,20 +23,20 @@ export const saveSticker = (name: string, buffer: Buffer, serial: string) =>
   new Promise((resolve, reject) => {
     if (isExist(name))
       return reject(debugWM + 'sticker dengan nama *' + name + '* masih ada!');
-    fs.writeFileSync('./sticker/' + name + '.webp', buffer);
+    fs.writeFileSync('../sticker/' + name + '.webp', buffer);
     spawn('webpmux', [
       '-set',
       'exif',
       './src/data.exif',
-      './sticker/' + name + '.webp',
+      '../sticker/' + name + '.webp',
       '-o',
-      './sticker/' + name + '.webp',
+      '../sticker/' + name + '.webp',
     ]).on('exit', () => {
       sticker[name] = {
         date_added: moment(),
         last_update: moment(),
         maker: serial,
-        path: './sticker/' + name + '.webp',
+        path: '../sticker/' + name + '.webp',
       };
       save();
       return resolve(
@@ -48,14 +49,14 @@ export const updateSticker = (name: string, buffer: Buffer) =>
   new Promise((resolve, reject) => {
     if (!isExist(name))
       return reject(debugWM + 'sticker dengan nama *' + name + '* tidak ada!');
-    fs.writeFileSync('./sticker/' + name + '.webp', buffer);
+    fs.writeFileSync('../sticker/' + name + '.webp', buffer);
     spawn('webpmux', [
       '-set',
       'exif',
       './src/data.exif',
-      './sticker/' + name + '.webp',
+      '../sticker/' + name + '.webp',
       '-o',
-      './sticker/' + name + '.webp',
+      '../sticker/' + name + '.webp',
     ]).on('exit', () => {
       sticker[name]!.last_update = moment();
       save();
@@ -69,7 +70,7 @@ export const deleteSticker = (name: string) => {
   if (!isExist(name))
     return debugWM + 'sticker dengan nama *' + name + '* tidak ada!';
   delete sticker[name];
-  fs.unlinkSync('./sticker/' + name + '.webp');
+  fs.unlinkSync('../sticker/' + name + '.webp');
   save();
   return debugWM + 'hapus sticker *' + name + '* sukses!';
 };

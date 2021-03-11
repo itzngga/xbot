@@ -1,6 +1,6 @@
 {
   "help": {
-    "count": 82,
+    "count": 83,
     "type": "member"
   },
   "kapan": {
@@ -100,7 +100,7 @@
     "type": "member"
   },
   "speed": {
-    "count": 145,
+    "count": 146,
     "type": "member"
   },
   "qrcode": {
@@ -332,7 +332,7 @@
     "type": "member"
   },
   "quality": {
-    "count": 0,
+    "count": 1,
     "type": "member"
   },
   "mimic": {
@@ -608,7 +608,7 @@
     "type": "member"
   },
   "getobj": {
-    "count": 113,
+    "count": 117,
     "type": "member"
   },
   "autoread": {
@@ -672,7 +672,7 @@
     "type": "member"
   },
   "copet": {
-    "count": 5,
+    "count": 6,
     "type": "member"
   },
   "group": {
@@ -728,7 +728,7 @@
     "type": "member"
   },
   "eval": {
-    "count": 94,
+    "count": 97,
     "type": "member"
   },
   "fisheye": {
@@ -764,15 +764,15 @@
     "type": "member"
   },
   "slist": {
-    "count": 3,
+    "count": 6,
     "type": "member"
   },
   "s": {
-    "count": 3,
+    "count": 4,
     "type": "member"
   },
   "sinfo": {
-    "count": 4,
+    "count": 6,
     "type": "member"
   },
   "supdate": {
@@ -780,7 +780,7 @@
     "type": "member"
   },
   "ssave": {
-    "count": 2,
+    "count": 4,
     "type": "member"
   },
   "info": {
@@ -793,6 +793,22 @@
   },
   "profile": {
     "count": 2,
+    "type": "member"
+  },
+  "round": {
+    "count": 14,
+    "type": "member"
+  },
+  "sdelete": {
+    "count": 7,
+    "type": "member"
+  },
+  "obfucate": {
+    "count": 1,
+    "type": "member"
+  },
+  "obfuscate": {
+    "count": 7,
     "type": "member"
   }
 }

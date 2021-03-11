@@ -5,9 +5,9 @@ const fs: any = require('fs-extra');
 if (typeof Array.prototype.splice === 'undefined') {
   Array.prototype.splice = function (index: number, howmanys: number) {
     const howmany = howmanys || this.length;
-    let elems = Array.prototype.slice.call(arguments, 2),
-      newArr = this.slice(0, index),
-      last = this.slice(index + howmany);
+    const elems = Array.prototype.slice.call(arguments, 2)
+    let newArr = this.slice(0, index)
+    const last = this.slice(index + howmany);
     newArr = newArr.concat.apply(newArr, elems);
     newArr = newArr.concat.apply(newArr, last);
     return newArr;

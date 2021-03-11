@@ -1,12 +1,8 @@
 import {reply} from '../types';
 import {db} from '../types/db';
-const fs: any = require('fs-extra');
 const saveReply = () => db.push('/reply', reply, true);
 
-export const isReply = (cmd: string) => {
-  return reply.hasOwnProperty(cmd);
-};
-
+export const isReply = (cmd: string) => reply.hasOwnProperty(cmd);
 export const getReply = (cmd: string) => {
   if (reply.hasOwnProperty(cmd)) {
     return reply[cmd]!.answer;

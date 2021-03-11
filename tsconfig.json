@@ -3,7 +3,8 @@
     "rootDir": ".",
     "outDir": "dist",
     "noEmitOnError": false,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "sourceMap": false
   },
   "include": [
     "src/**/*.ts",

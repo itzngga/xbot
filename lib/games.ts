@@ -11,7 +11,7 @@ const tictactoe: any = require('tictactoe-minimax-ai');
 const cakLontong = fs.readJSONSync('../json/caklontong.json');
 const slots = ['🍇', '🍊', '🍐', '🍒', '🍋', '🍌', '🔔'];
 const game: Set<string> = new Set();
-registerFont('./fonts/Captcha.ttf', {family: 'Captcha'});
+registerFont('../fonts/Captcha.ttf', {family: 'Captcha'});
 
 // high 56
 // low 55
@@ -306,6 +306,7 @@ export default class Game {
           .then(res => {
             if (res.body[0] === 'yes') return true;
             if (res.body[0] === 'no') return false;
+            return false;
           })
           .catch(err => {
             console.log(err);

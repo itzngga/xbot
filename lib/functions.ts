@@ -1,3 +1,4 @@
+import fetch from 'node-fetch';
 import moment from 'moment';
 import axios from 'axios';
 import striptags from 'striptags';
@@ -6,10 +7,9 @@ import brain from 'brainly-scraper-v2';
 import pretty from 'pretty-bytes';
 import {WAGroupParticipant} from '@adiwajshing/baileys';
 import {setting, config} from '../types/index';
-const node_fetch: any = require('node-fetch');
+import ffmpeg from 'fluent-ffmpeg';
 const translatte: any = require('translatte');
 const fs: any = require('fs-extra');
-const ffmpeg: any = require('fluent-ffmpeg');
 const ytSearch: any = require('yt-search');
 const tesseract: any = require('node-tesseract-ocr');
 const {spawn}: any = require('child_process');
@@ -18,8 +18,8 @@ const momentDur = require('moment-duration-format');
 const {apikeys, ytCookie, ytIdentity} = config;
 momentDur(moment);
 
-function post(url: string, formdata: any): any {
-  return node_fetch(url, {
+function post(url: string, formdata: any) {
+  return fetch(url, {
     method: 'POST',
     headers: {
       accept: '*/*',
@@ -47,9 +47,9 @@ function curlyRemover(chat: string): string {
   }
   return chat;
 }
-export const quoted = async (maker: string, quote: string): Promise<any> =>
+export const quoted = (maker: string, quote: string): Promise<any> =>
   new Promise(async (resolve, reject) => {
-    const response = await node_fetch(
+    const response = await fetch(
       `https://terhambar.com/aw/qts/?kata=${quote}&author=${maker}&tipe=random`
     );
     if (!response.ok) reject(`unexpected response ${response.statusText}`);
@@ -61,7 +61,7 @@ export const quoted = async (maker: string, quote: string): Promise<any> =>
     }
   });
 export const ytmp3 = async (url: string): Promise<any> => {
-  const response = await node_fetch(
+  const response = await fetch(
     'http://scrap.terhambar.com/yt?link=' + url
   );
   if (!response.ok)
@@ -71,14 +71,14 @@ export const ytmp3 = async (url: string): Promise<any> => {
 };
 
 export const wallpaperanime = async (): Promise<any> => {
-  const response = await node_fetch('https://nekos.life/api/v2/img/wallpaper');
+  const response = await fetch('https://nekos.life/api/v2/img/wallpaper');
   if (!response.ok) throw new Error('unexpected response');
   const json = await response.json();
   return json.url;
 };
 export const anime = (judulanime: string): any =>
   new Promise(async (resolve, reject) => {
-    const response = await node_fetch(
+    const response = await fetch(
       'https://api.jikan.moe/v3/search/anime?q=' + judulanime + '&limit=1'
     );
     if (!response.ok) return reject('Anime tidak di temukan!');
@@ -113,7 +113,7 @@ _*「 XyZ BOT Automation 」*_`,
     });
   });
 export const quotes = async () => {
-  const response = await node_fetch('https://api.terhambar.com/qts/');
+  const response = await fetch('https://api.terhambar.com/qts/');
   if (!response.ok)
     throw new Error(`unexpected response ${response.statusText}`);
   const json = await response.json();
@@ -147,9 +147,9 @@ export const quotes = async () => {
 //         return reject(err);
 //       });
 //   });
-export const meme = async (): Promise<any> =>
+export const meme = (): Promise<any> =>
   new Promise(async (resolve, reject) => {
-    const response = await node_fetch(
+    const response = await fetch(
       'https://meme-api.herokuapp.com/gimme/wholesomeanimemes'
     );
     if (!response.ok) reject(`unexpected response ${response.statusText}`);
@@ -159,7 +159,7 @@ export const meme = async (): Promise<any> =>
       link: json.url,
     });
   });
-export const corona = async (): Promise<string> =>
+export const corona = (): Promise<string> =>
   new Promise(async (resolve, reject) => {
     axios
       .all([
@@ -200,7 +200,7 @@ _*「 XyZ BOT Information 」*_
         return reject(err);
       });
   });
-export const brainly = async (question: string): Promise<string> =>
+export const brainly = (question: string): Promise<string> =>
   new Promise(async (resolve, reject) => {
     try {
       let hasilnya =
@@ -229,17 +229,17 @@ export const brainly = async (question: string): Promise<string> =>
     }
   });
 export const simsimichat = async (chat: string): Promise<any> => {
-  const response = await node_fetch(
+  const response = await fetch(
     `https://simsumi.herokuapp.com/api?text=${chat}&lang=id`
   );
   if (!response.ok) throw new Error('unexpected response');
   const json = await response.json();
   return json.success;
 };
-export const wait = async (media: Buffer): Promise<string> =>
+export const wait = (media: Buffer): Promise<string> =>
   new Promise(async (resolve, reject) => {
     const attachmentData = `data:image/jpeg;base64,${media.toString('base64')}`;
-    const response = await node_fetch('https://trace.moe/api/search', {
+    const response = await fetch('https://trace.moe/api/search', {
       method: 'POST',
       body: JSON.stringify({image: attachmentData}),
       headers: {'Content-Type': 'application/json'},
@@ -257,9 +257,9 @@ export const wait = async (media: Buffer): Promise<string> =>
 
 _*「 XyZ BOT Automation 」*_`);
   });
-export const removeBg = async (media: Buffer): Promise<Buffer> =>
+export const removeBg = (media: Buffer): Promise<Buffer> =>
   new Promise(async (resolve, reject) => {
-    const response = await node_fetch('https://api.remove.bg/v1.0/removebg', {
+    const response = await fetch('https://api.remove.bg/v1.0/removebg', {
       method: 'POST',
       body: JSON.stringify({
         image_file_b64: media.toString('base64'),
@@ -274,9 +274,9 @@ export const removeBg = async (media: Buffer): Promise<Buffer> =>
     if (!response.ok) reject('Gambar tidak valid!');
     return resolve(await response.buffer());
   });
-export const ig = async (url: string): Promise<any> =>
+export const ig = (url: string): Promise<any> =>
   new Promise(async (resolve, reject) => {
-    const response = await node_fetch(
+    const response = await fetch(
       `https://api.i-tech.id/dl/igdl?key=${apikeys.tech}&link=${url}`
     );
     const json = await response.json();
@@ -285,7 +285,7 @@ export const ig = async (url: string): Promise<any> =>
     const type = () => (json.result[0].type == 'image' ? '.jpg' : '.mp4');
     return resolve({url: `${json.result[0].url}`, type: type()});
   });
-export const surat = async (surah: number, ayat: number): Promise<string> =>
+export const surat = (surah: number, ayat: number): Promise<string> =>
   new Promise(async (resolve, reject) => {
     if (!isNaN(surah) && surah <= 114) {
       if (ayat !== undefined) {
@@ -370,7 +370,7 @@ export const imp3 = (query: string): Promise<any> =>
       /(?:https?:\/{2})?(?:w{3}\.)?youtu(?:be)?\.(?:com|be)(?:\/watch\?v=|\/)([^\s&]+)/
     );
     fs.access(
-      './temp/' + videoid[1] + '.m4a',
+      '../temp/' + videoid[1] + '.m4a',
       fs.constants.F_OK,
       (err: any) => {
         if (!err) {
@@ -399,7 +399,7 @@ export const imp3 = (query: string): Promise<any> =>
                 ffmpeg(stream)
                   .audioCodec('aac')
                   .addOutputOptions('-map 0:a')
-                  .save(`./temp/${videoid[1]}.m4a`)
+                  .save(`../temp/${videoid[1]}.m4a`)
                   .on('end', () => {
                     resolve({
                       id: videoid[1],
@@ -422,7 +422,7 @@ export const imp3 = (query: string): Promise<any> =>
   });
 export const cuaca = (kota: string): Promise<string> =>
   new Promise(async (resolve, reject) => {
-    const response = await node_fetch(
+    const response = await fetch(
       `https://api.openweathermap.org/data/2.5/weather?q=${kota}&appid=d4f4046ff211ca0287ccea5c28ad4b0f&lang=id&units=metric`
     );
     if (!response.ok) return reject(`Kota ${kota} tidak valid/Sedang Error`);
@@ -440,9 +440,9 @@ export const cuaca = (kota: string): Promise<string> =>
 export const ocr = (id: string): Promise<string> =>
   new Promise(async (resolve, reject) => {
     tesseract
-      .recognize(`./temp/${id}.jpeg`, {lang: 'eng+ind', oem: 1, psm: 3})
+      .recognize(`../temp/${id}.jpeg`, {lang: 'eng+ind', oem: 1, psm: 3})
       .then((text: string) => {
-        fs.unlink(`./temp/${id}.jpeg`, () => {});
+        fs.unlink(`../temp/${id}.jpeg`, () => {});
         if (!text.trim())
           return reject('Text tidak terbaca, coba gambar lain!');
         return resolve(text);
@@ -457,13 +457,13 @@ export const extract = (id: string): Promise<string> =>
       '-y',
       '-vn',
       '-i',
-      `./extract/${id}.mp4`,
+      `../extract/${id}.mp4`,
       '-codec:a',
       'libmp3lame',
-      `./extract/${id}.ogg`,
+      `../extract/${id}.ogg`,
     ]);
     udud.on('close', () => {
-      const buff = fs.readFileSync('./extract/' + id + '.ogg');
+      const buff = fs.readFileSync('../extract/' + id + '.ogg');
       const formated = `data:audio/mp3;base64,${buff.toString('base64')}`;
       return resolve(formated);
     });
@@ -473,7 +473,7 @@ export const extract = (id: string): Promise<string> =>
   });
 export const food = (): any =>
   new Promise(async (resolve, reject) => {
-    const response = await node_fetch('https://foodish-api.herokuapp.com/api');
+    const response = await fetch('https://foodish-api.herokuapp.com/api');
     if (!response.ok) return reject('Sedang Error');
     const json = await response.json();
     return resolve(json.image);
@@ -490,26 +490,26 @@ export const getGroupAdmins = (
 export const modifExif = (
   buffer: Buffer,
   id: string,
-  callback: (res: string) => void
+  callback: (res: Buffer) => void
 ) => {
-  fs.writeFileSync('./temp/' + id + '.webp', buffer);
+  fs.writeFileSync('../temp/' + id + '.webp', buffer);
   const {spawn} = require('child_process');
   spawn('webpmux', [
     '-set',
     'exif',
-    './src/data.exif',
-    './temp/' + id + '.webp',
+    '../src/data.exif',
+    '../temp/' + id + '.webp',
     '-o',
-    './temp/' + id + '.webp',
+    '../temp/' + id + '.webp',
   ]).on('exit', () => {
-    callback(fs.readFileSync('./temp/' + id + '.webp'));
-    fs.unlink('./temp/' + id + '.webp').then(() => {});
+    callback(fs.readFileSync('../temp/' + id + '.webp'));
+    fs.unlink('../temp/' + id + '.webp').then(() => {});
   });
 };
 export const getBuffer = (url: string): Promise<Buffer> =>
   new Promise(async (resolve, reject) => {
     try {
-      const response = await node_fetch(url);
+      const response = await fetch(url);
       if (!response.ok) return reject('Sedang Error');
       return resolve(response.buffer());
     } catch (error) {

@@ -1,6 +1,6 @@
 import * as type from '../types';
 const fs: any = require('fs-extra');
-const count: type.countType = fs.readJSONSync('./json/count.json');
+const count: type.countType = fs.readJSONSync('../json/count.json');
 const setting = type.setting;
 const cron: any = require('node-cron');
 
@@ -21,7 +21,7 @@ export const addCount = (cmd: string): boolean => {
   }
 };
 const saveCount = (): void => {
-  return fs.writeJSONSync('./json/count.json', count, {spaces: 2});
+  return fs.writeJSONSync('../json/count.json', count, {spaces: 2});
 };
 export const countAll = (): any => {
   let counts = 0;

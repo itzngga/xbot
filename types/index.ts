@@ -8,10 +8,10 @@ export const sticker = db.getObject<stickerType>('/sticker');
 export const config = db.getObject<configType>('/config');
 export const reply = db.getObject<reply>('/reply');
 export const cloud = db.getObject<cloud>('/cloud');
-export const textpro = fs.readJSONSync('./json/textpro.json');
+export const textpro = db.getObject<string[]>('/textpro');
 export const publicJid = new Set(db.getObject<string[]>('/publicJid'));
 export const arryOfWords = db.getObject<string[]>('/arryOfWords');
-export const fakeReplyBase64 = db.getObject<string>('/fakeReplyBase64');
+export const fakeReplyBase64 = db.getObject('/fakeReplyBase64');
 
 export const updateObj = (name: string) => {
   eval(name);

@@ -1,4 +1,5 @@
 import {cloud, config} from '../types';
+import {db} from '../types/db';
 const fs: any = require('fs-extra');
 const cryptojs: any = require('crypto-js');
 const {secret} = config;
@@ -7,7 +8,7 @@ function getHash(key: string): string {
   return cryptojs.HmacSHA256(key, secret).toString();
 }
 function saveJSON(): void {
-  return fs.writeJSONSync('./cloud/cloud.json', cloud, {spaces: 2});
+  return db.push('/cloud', cloud, true);
 }
 
 export const findCloud = (id: string): Promise<string> =>
@@ -29,8 +30,8 @@ export const addCloud = (
   new Promise((resolve, reject) => {
     const id = getHash(asu);
     if (!cloud.hasOwnProperty(id)) {
-      cloud[id] = rawCloud('./cloud/' + id + '.' + format, format, time);
-      fs.writeFile('./cloud/' + id + '.' + format, buffer).then(() => {
+      cloud[id] = rawCloud('../cloud/' + id + '.' + format, format, time);
+      fs.writeFile('../cloud/' + id + '.' + format, buffer).then(() => {
         saveJSON();
         return resolve('Sukses menambah file ke cloud!');
       });
@@ -43,7 +44,7 @@ export const removeCloud = (asu: string): Promise<string> =>
   new Promise((resolve, reject) => {
     const id = getHash(asu);
     if (cloud.hasOwnProperty(id)) {
-      fs.unlink('./cloud/' + id + '.' + cloud[id]?.format).then(() => {
+      fs.unlink('../cloud/' + id + '.' + cloud[id]?.format).then(() => {
         delete cloud[id];
         saveJSON();
         return resolve('File cloud berhasil di hapus!');
