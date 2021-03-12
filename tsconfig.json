@@ -1,16 +1,19 @@
 {  "extends": "./node_modules/gts/tsconfig-google.json",
   "compilerOptions": {
-    "rootDir": ".",
+    "rootDir": "./",
+    "baseUrl": "./",
     "outDir": "dist",
     "noEmitOnError": false,
     "esModuleInterop": true,
     "sourceMap": false,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "noImplicitReturns": false
   },
   "include": [
     "src/**/*.ts",
     "index.ts",
-    "types**/*.ts"
+    "types**/*.ts",
+    "nsfw_model"
   ],
-  "exclude": ["temp", "sticker", "json", "image", "groups","gif","fonts","cloud"]
+  "exclude": ["temp", "sticker", "json", "image", "groups", "gif", "fonts", "cloud"]
 }

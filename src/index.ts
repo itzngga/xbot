@@ -1,3 +1,6 @@
+/* eslint-disable prefer-rest-params */
+/* eslint-disable prefer-spread */
+/* eslint-disable no-inner-declarations */
 import os from 'os';
 import util from 'util';
 import sharp from 'sharp';
@@ -95,7 +98,7 @@ const config = constant.config;
 const arryOfWords = constant.arryOfWords;
 const publicJid = new Set(constant.publicJid);
 const textpro = constant.textpro;
-const itech = require('itech-wrapper').key(config.apikeys.tech)
+const itech = require('itech-wrapper').key(config.apikeys.tech);
 import {
   WAMessage,
   MessageType,
@@ -105,10 +108,9 @@ import {
   WA_MESSAGE_STUB_TYPES,
   WAContactMessage,
 } from '@adiwajshing/baileys';
-import {clear} from 'console';
 import {Readable} from 'stream';
 import * as jsondb from '../types/db';
-const db = jsondb.db
+const db = jsondb.db;
 const {
   text,
   extendedText,
@@ -138,25 +140,25 @@ process.on('rejectionHandled', promise => {
 
 //-----------------------config-----------------------//
 
-let {pm2Id, prefix, sAdmin, autoRead, autoReply, antiVirtex, unSend} = setting;
-const count = fs.readJSONSync('../json/count.json');
+// eslint-disable-next-line prefer-const
+let {pm2Id, prefix, sAdmin, autoRead, autoReply, antiVirtex} = setting;
 moment.locale('id');
 const isUrl = new RegExp(
-  /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/gi
+  /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)/gi
 );
 function suggestionList() {
-  const objects = []
-  for (let [key, vals] of Object.entries(count)) {
-    const val: any = vals
-    if (val.type == 'member') objects.push(key);
+  const objects = [];
+  for (const [key, vals] of Object.entries(constant.count)) {
+    const val: any = vals;
+    if (val.type === 'member') objects.push(key);
   }
   return objects;
 }
 const {apikeys, vcard} = config;
-const mimics: string[] = []
+const mimics: string[] = [];
 let debug = false;
 let logMode = true;
-const suggestions = suggestionList()
+const suggestions = suggestionList();
 let autoSuggest = false;
 const getLirik = new Genius.Client(apikeys.genius);
 const bitly: any = new (require('bitly').BitlyClient)(apikeys.bitly);
@@ -174,16 +176,16 @@ const debugWM = '*「 DEBUG 」*\n\n';
 //     db.push('/setting', setting, true)
 // }
 if (typeof Array.prototype.splice === 'undefined') {
-    Array.prototype.splice = function (index: number, howmanys: number) {
-      const howmany = howmanys || this.length;
-      const elems = Array.prototype.slice.call(arguments, 2)
-      let newArr = this.slice(0, index)
-      const last = this.slice(index + howmany);
-      newArr = newArr.concat.apply(newArr, elems);
-      newArr = newArr.concat.apply(newArr, last);
-      return newArr;
-    };
-  }
+  Array.prototype.splice = function (index: number, howmanys: number) {
+    const howmany = howmanys || this.length;
+    const elems = Array.prototype.slice.call(arguments, 2);
+    let newArr = this.slice(0, index);
+    const last = this.slice(index + howmany);
+    newArr = newArr.concat.apply(newArr, elems);
+    newArr = newArr.concat.apply(newArr, last);
+    return newArr;
+  };
+}
 // function sleep(ms: number): Promise<NodeJS.Timeout> {
 //   return new Promise(resolve => setTimeout(resolve, ms));
 // }
@@ -217,25 +219,25 @@ function upTime() {
   ut_hour = ut_hour % 60;
   ut_min = ut_min % 60;
   ut_sec = ut_sec % 60;
-  return ut_hour + ' JAM ' + ut_min + ' MENIT '+ ut_sec + ' DETIK';
+  return ut_hour + ' JAM ' + ut_min + ' MENIT ' + ut_sec + ' DETIK';
 }
 function formatTrue(target: boolean): string {
   if (target) return 'Ya';
-  else if (target == false) return 'Tidak';
+  else if (target === false) return 'Tidak';
   return target;
 }
 function formatOnOff(target: boolean): string {
   if (target) return 'ON';
-  else if (target == false) return 'OFF';
+  else if (target === false) return 'OFF';
   return target;
 }
 function is_undefined(input: any): boolean {
-  let u = void 0;
+  const u = void 0;
   return input === u;
 }
 const filterWord = (text: string): string | boolean => {
   if (text.toLowerCase().match(new RegExp(filteredWord(), 'g'))) {
-    return `Mohon untuk tidak menggunakan kata2 KASAR/TABU!`;
+    return 'Mohon untuk tidak menggunakan kata2 KASAR/TABU!';
   } else {
     return false;
   }
@@ -271,8 +273,6 @@ const getPic = (serial: string): Promise<Buffer> =>
         return resolve(fs.readFileSync('../imagedefault-dp.jpeg'));
       });
   });
-
-clear();
 console.log('------------------------------------------------');
 console.log(
   color(
@@ -287,9 +287,9 @@ console.log('•', color('[INFO]', 'yellow'), color('BOT Started!'));
 
 cron.schedule('0 0 0 * * *', () => {
   const {spawn} = require('child_process');
-  let hari = moment().format('dddd');
-  let date = moment().format('Do MMMM YYYY');
-  let anjay1 = spawn('convert', [
+  const hari = moment().format('dddd');
+  const date = moment().format('Do MMMM YYYY');
+  const anjay1 = spawn('convert', [
     '../imagetemplate-backup.jpg',
     '-font',
     '../fonts/Indie-Flower.ttf',
@@ -303,7 +303,7 @@ cron.schedule('0 0 0 * * *', () => {
     '../imagetemplate.jpg',
   ]);
   anjay1.on('close', () => {
-    let anjay2 = spawn('convert', [
+    const anjay2 = spawn('convert', [
       '../imagetemplate.jpg',
       '-font',
       '../fonts/Indie-Flower.ttf',
@@ -330,16 +330,15 @@ export async function unSendHandler(message: WAMessage): Promise<any> {
     const replyMode = setting.fakeReply
       ? client.generateFakeReply(setting.fakeText)
       : message;
-    if (messageStubType == 'REVOKE') {
-      if (!unSend.includes(from!)) return;
+    console.log(message);
+    if (messageStubType === 'REVOKE') {
+      if (!setting.unSend.includes(from!)) return;
       const isGroupMsg = from!.endsWith('@g.us') ? true : false;
       const sender: any = fromMe
         ? client.user.jid
         : isGroupMsg
         ? message.participant
         : from;
-      let int: any,
-        infoMSG = JSON.parse(fs.readFileSync('../src/.dat/msg.data.json'));
       const conts = fromMe
         ? client.contacts[sender]
         : client.contacts[sender] || {
@@ -347,95 +346,141 @@ export async function unSendHandler(message: WAMessage): Promise<any> {
             vname: sender.replace(/@.+/, ''),
             notify: sender.replace(/@.+/, ''),
           };
-      const pushname = fromMe
-        ? client.user.name
-        : conts!.notify || conts!.vname || conts!.name || '-';
-      const contextInfo = {mentionedJid: [sender]};
-      for (let i = 0; i < infoMSG.length; i++) {
-        if (infoMSG[i].key.id == id_deleted) {
-          const dataInfo = infoMSG[i];
-          const type = Object.keys(infoMSG[i].message)[0];
-          const timestamp = infoMSG[i].messageTimestamp;
-          int = {
-            no: i,
-            type: type,
-            timestamp: timestamp,
-            data: dataInfo,
-          };
-        }
-      }
-      const index = Number(int.no);
-      const body =
-        int.type == 'conversation'
-          ? infoMSG[index].message.conversation
-          : int.type == 'extendedTextMessage'
-          ? infoMSG[index].message.extendedTextMessage.text
-          : int.type == 'imageMessage'
-          ? infoMSG[index].message.imageMessage.caption
-          : int.type == 'stickerMessage'
-          ? 'Sticker'
-          : int.type == 'audioMessage'
-          ? 'Audio'
-          : int.type == 'videoMessage'
-          ? infoMSG[index].videoMessage.caption
-          : infoMSG[index];
-      if (int.type == 'conversation' || int.type == 'extendedTextMessage') {
-        const strConversation = `「 *ANTI-DELETE* 」
-*Nama :* ${pushname} ( @${sender.replace('@s.whatsapp.net', '')} )
-*Tipe :* Text
-*Waktu :* ${moment.unix(int.timestamp).format('HH:mm:ss DD/MM/YYYY')}
-*Pesan :* ${body ? body : '-'}
-`;
-        client.sendMessage(from!, strConversation, text, {
-          quoted: replyMode,
-          contextInfo: contextInfo,
-        });
-      } else if (int.type == 'stickerMessage') {
-        const filename = `${sender.replace(
-          '@s.whatsapp.net',
-          ''
-        )}-${moment().unix()}`;
-        const savedFilename = await client.downloadAndSaveMediaMessage(
-          int.data,
-          `../temp/${filename}`
-        );
-        const strConversation = `「 *ANTI-DELETE* 」
-Nama :* ${pushname} ( @${sender.replace('@s.whatsapp.net', '')} )
-Tipe :* Sticker
-Waktu :* ${moment.unix(int.timestamp).format('HH:mm:ss DD/MM/YYYY')}
-`;
+      //       const quotedMsgObj = () =>
+      //         isQuoted
+      //           ? JSON.parse(JSON.stringify(message).replace('quotedM', 'm')).message
+      //               .extendedTextMessage.contextInfo
+      //           : false;
+      //       const pushname = fromMe
+      //         ? client.user.name
+      //         : conts!.notify || conts!.vname || conts!.name || '-';
+      //       const contextInfo = {mentionedJid: [sender]};
 
-        const buff = fs.readFileSync(savedFilename);
-        client.sendMessage(from!, strConversation, text, {
-          quoted: replyMode,
-          contextInfo: contextInfo,
-        });
-        client.sendMessage(from!, buff, sticker, {quoted: replyMode});
-        // console.log(stdout)
-        fs.unlinkSync(savedFilename);
-      } else if (int.type == 'imageMessage') {
-        const filename = `${sender.replace(
-          '@s.whatsapp.net',
-          ''
-        )}-${moment().unix()}`;
-        const savedFilename = await client.downloadAndSaveMediaMessage(
-          int.data,
-          `../temp/${filename}`
-        );
-        const buff = fs.readFileSync(savedFilename);
-        const strConversation = `「 *ANTI-DELETE* 」
-*Nama :* ${pushname} ( @${sender.replace('@s.whatsapp.net', '')} )
-*Tipe :* Image
-*Waktu :* ${moment.unix(int.timestamp).format('HH:mm:ss DD/MM/YYYY')}
-*Pesan :* ${body ? body : '-'}\`\`\`
-`;
-        client.sendMessage(from!, buff, image, {
-          quoted: replyMode,
-          contextInfo: contextInfo,
-          caption: strConversation,
-        });
-        fs.unlinkSync(savedFilename);
-      }
+      //       const buff = fs.readFileSync(res);
+      //       const njay: any = await file_type.fromBuffer(buff);
+      //       function send(type: MessageType) {
+      //         client.sendMessage(from, buff, type, {
+      //           caption: '*XyZ BOT Cloud*',
+      //           quoted: replyMode,
+      //           mimetype: type === audio ? Mimetype.mp4Audio : njay.mime,
+      //         });
+      //       }
+      //       function sendSticker() {
+      //         client.sendMessage(from, buff, sticker, {quoted: replyMode});
+      //       }
+      //       switch (njay.ext) {
+      //         case 'mp4':
+      //           send(video);
+      //           break;
+      //         case 'mp3':
+      //           send(audio);
+      //           break;
+      //         case 'jpg':
+      //           send(image);
+      //           break;
+      //         case 'png':
+      //           send(image);
+      //           break;
+      //         case 'm4a':
+      //           send(audio);
+      //           break;
+      //         case 'webp':
+      //           sendSticker();
+      //           break;
+      //         default:
+      //           client.sendMessage(from, buff, document, {
+      //             filename: 'cloud.' + njay.ext,
+      //             caption: '*XyZ BOT Cloud*',
+      //             quoted: replyMode,
+      //             mimetype: njay.mime,
+      //           });
+      //           break;
+      //       }
+      //       for (let i = 0; i < infoMSG.length; i++) {
+      //         if (infoMSG[i].key.id === id_deleted) {
+      //           const dataInfo = infoMSG[i];
+      //           const type = Object.keys(infoMSG[i].message)[0];
+      //           const timestamp = infoMSG[i].messageTimestamp;
+      //           int = {
+      //             no: i,
+      //             type: type,
+      //             timestamp: timestamp,
+      //             data: dataInfo,
+      //           };
+      //         }
+      //       }
+      //       const index = Number(int.no);
+      //       const body =
+      //         int.type === 'conversation'
+      //           ? infoMSG[index].message.conversation
+      //           : int.type === 'extendedTextMessage'
+      //           ? infoMSG[index].message.extendedTextMessage.text
+      //           : int.type === 'imageMessage'
+      //           ? infoMSG[index].message.imageMessage.caption
+      //           : int.type === 'stickerMessage'
+      //           ? 'Sticker'
+      //           : int.type === 'audioMessage'
+      //           ? 'Audio'
+      //           : int.type === 'videoMessage'
+      //           ? infoMSG[index].videoMessage.caption
+      //           : infoMSG[index];
+      //       if (int.type === 'conversation' || int.type === 'extendedTextMessage') {
+      //         const strConversation = `「 *ANTI-DELETE* 」
+      // *Nama :* ${pushname} ( @${sender.replace('@s.whatsapp.net', '')} )
+      // *Tipe :* Text
+      // *Waktu :* ${moment.unix(int.timestamp).format('HH:mm:ss DD/MM/YYYY')}
+      // *Pesan :* ${body ? body : '-'}
+      // `;
+      //         client.sendMessage(from!, strConversation, text, {
+      //           quoted: replyMode,
+      //           contextInfo: contextInfo,
+      //         });
+      //       } else if (int.type === 'stickerMessage') {
+      //         const filename = `${sender.replace(
+      //           '@s.whatsapp.net',
+      //           ''
+      //         )}-${moment().unix()}`;
+      //         const savedFilename = await client.downloadAndSaveMediaMessage(
+      //           int.data,
+      //           `../temp/${filename}`
+      //         );
+      //         const strConversation = `「 *ANTI-DELETE* 」
+      // Nama :* ${pushname} ( @${sender.replace('@s.whatsapp.net', '')} )
+      // Tipe :* Sticker
+      // Waktu :* ${moment.unix(int.timestamp).format('HH:mm:ss DD/MM/YYYY')}
+      // `;
+
+      //         const buff = fs.readFileSync(savedFilename);
+      //         client.sendMessage(from!, strConversation, text, {
+      //           quoted: replyMode,
+      //           contextInfo: contextInfo,
+      //         });
+      //         client.sendMessage(from!, buff, sticker, {quoted: replyMode});
+      //         // console.log(stdout)
+      //         fs.unlinkSync(savedFilename);
+      //       } else if (int.type === 'imageMessage') {
+      //         const filename = `${sender.replace(
+      //           '@s.whatsapp.net',
+      //           ''
+      //         )}-${moment().unix()}`;
+      //         const savedFilename = await client.downloadAndSaveMediaMessage(
+      //           int.data,
+      //           `../temp/${filename}`
+      //         );
+      //         const buff = fs.readFileSync(savedFilename);
+      //         const strConversation = `「 *ANTI-DELETE* 」
+      // *Nama :* ${pushname} ( @${sender.replace('@s.whatsapp.net', '')} )
+      // *Tipe :* Image
+      // *Waktu :* ${moment.unix(int.timestamp).format('HH:mm:ss DD/MM/YYYY')}
+      // *Pesan :* ${body ? body : '-'}\`\`\`
+      // `;
+      //         client.sendMessage(from!, buff, image, {
+      //           quoted: replyMode,
+      //           contextInfo: contextInfo,
+      //           caption: strConversation,
+      //         });
+      //         fs.unlinkSync(savedFilename);
+      //       }
     }
   } catch (e) {
     console.log('Message : %s', color(e, 'green'));
@@ -444,6 +489,7 @@ Waktu :* ${moment.unix(int.timestamp).format('HH:mm:ss DD/MM/YYYY')}
 }
 export async function handler(message: WAMessage): Promise<any> {
   try {
+    if (message.messageStubType === 1) console.log(message);
     const fromMe: boolean = message.key.fromMe!;
     const chatId: string = message.key.remoteJid!;
     const msgId: string = message.key.id!;
@@ -454,9 +500,9 @@ export async function handler(message: WAMessage): Promise<any> {
     const isGroupMsg = from.includes('@g.us');
     const serial = fromMe ? botNumber : isGroupMsg ? message.participant : from;
     if (!fromMe && (setting.universalPublic || !publicJid.has(serial))) return;
-    const isSadmin = sAdmin == serial;
+    const isSadmin = sAdmin === serial;
     const type: string = Object.keys(message.message!)[0];
-    const isQuoted = type == 'extendedTextMessage';
+    const isQuoted = type === 'extendedTextMessage';
     const content = () => {
       try {
         return Object.keys(
@@ -467,18 +513,18 @@ export async function handler(message: WAMessage): Promise<any> {
       }
     };
     const body: string =
-      type == 'conversation'
+      type === 'conversation'
         ? message.message!.conversation!
-        : type == 'imageMessage'
+        : type === 'imageMessage'
         ? message.message!.imageMessage!.caption!
-        : type == 'videoMessage'
+        : type === 'videoMessage'
         ? message.message!.videoMessage!.caption!
-        : type == 'extendedTextMessage'
+        : type === 'extendedTextMessage'
         ? message.message!.extendedTextMessage!.text!
         : '';
     const t = <number>message.messageTimestamp * 1000;
     const time = moment(t).format('HH:mm:ss');
-    const cmd: string = body.substr(0, 1) == prefix ? body : '';
+    const cmd: string = body.substr(0, 1) === prefix ? body : '';
     const args: any = cmd.split(' ');
     const groupMetadata: any = isGroupMsg
       ? await client.groupMetadata(from)
@@ -494,26 +540,26 @@ export async function handler(message: WAMessage): Promise<any> {
       ? groupMetadata.announce
       : false;
     const isMedia =
-      type == 'imageMessage' ||
-      type == 'videoMessage' ||
-      type == 'audioMessage' ||
-      type == 'stickerMessage' ||
-      type == 'documentMessage';
+      type === 'imageMessage' ||
+      type === 'videoMessage' ||
+      type === 'audioMessage' ||
+      type === 'stickerMessage' ||
+      type === 'documentMessage';
     const isImage = isQuoted
-      ? content() == 'imageMessage'
-      : type == 'imageMessage';
+      ? content() === 'imageMessage'
+      : type === 'imageMessage';
     const isVideo = isQuoted
-      ? content() == 'videoMessage'
-      : type == 'videoMessage';
-    // const isAudio = isQuoted ? content() == 'audioMessage' : type == 'audioMessage';
-    // const isSticker = isQuoted ? content() == 'stickerMessage' : type == 'stickerMessage';
-    // const isDocument = isQuoted ? content() == 'documentMessage' : type == 'documentMessage';
-    const isQuotedText = content() == 'conversation';
-    const isQuotedImage = content() == 'imageMessage';
-    const isQuotedVideo = content() == 'videoMessage';
-    const isQuotedAudio = content() == 'audioMessage';
-    const isQuotedSticker = content() == 'stickerMessage';
-    const isQuotedDocument = content() == 'documentMessage';
+      ? content() === 'videoMessage'
+      : type === 'videoMessage';
+    // const isAudio = isQuoted ? content() === 'audioMessage' : type === 'audioMessage';
+    // const isSticker = isQuoted ? content() === 'stickerMessage' : type === 'stickerMessage';
+    // const isDocument = isQuoted ? content() === 'documentMessage' : type === 'documentMessage';
+    const isQuotedText = content() === 'conversation';
+    const isQuotedImage = content() === 'imageMessage';
+    const isQuotedVideo = content() === 'videoMessage';
+    const isQuotedAudio = content() === 'audioMessage';
+    const isQuotedSticker = content() === 'stickerMessage';
+    const isQuotedDocument = content() === 'documentMessage';
     const quotedMsgObj = () =>
       isQuoted
         ? JSON.parse(JSON.stringify(message).replace('quotedM', 'm')).message
@@ -563,10 +609,22 @@ export async function handler(message: WAMessage): Promise<any> {
       }
     };
     const pushname = (target?: string) => {
-        let targets: string = target || serial;
-        let v = targets === '0@s.whatsapp.net' ? {jid: targets, vname: 'WhatsApp'} : targets === client.user.jid ? client.user : client.addContact(targets) 
-        return v.name || v.vname || v.notify || libphonenumber('+' + v.jid.replace('@s.whatsapp.net', '')).getNumber('international')
-    }
+      const targets: string = target || serial;
+      const v =
+        targets === '0@s.whatsapp.net'
+          ? {jid: targets, vname: 'WhatsApp'}
+          : targets === client.user.jid
+          ? client.user
+          : client.addContact(targets);
+      return (
+        v.name ||
+        v.vname ||
+        v.notify ||
+        libphonenumber('+' + v.jid.replace('@s.whatsapp.net', '')).getNumber(
+          'international'
+        )
+      );
+    };
     const mentionedJidList = () => {
       if (!is_undefined(quotedMsgObj().mentionedJid)) {
         return quotedMsgObj().mentionedJid;
@@ -591,7 +649,7 @@ export async function handler(message: WAMessage): Promise<any> {
     // }
     function mentions(id: any, teks: string, member: string[]) {
       client.chatRead(from);
-      id == null || id == undefined || id == false
+      id === null || id === undefined || id === false
         ? client.sendMessage(from, teks.trim(), extendedText, {
             contextInfo: {mentionedJid: member},
           })
@@ -601,7 +659,7 @@ export async function handler(message: WAMessage): Promise<any> {
           });
     }
     const pre = (cmd: string) => {
-      if (args[0] == prefix + cmd) {
+      if (args[0] === prefix + cmd) {
         client.chatRead(from);
         if (!isGroupMsg && logMode)
           console.log(
@@ -628,13 +686,13 @@ export async function handler(message: WAMessage): Promise<any> {
       return false;
     };
     const secondParam = (param: string): boolean => {
-      if (args[1] == param) {
+      if (args[1] === param) {
         return true;
       }
       return false;
     };
     function permission(permArry: string[]): boolean {
-      for (let i of permArry) {
+      for (const i of permArry) {
         if (i === 'self' && !fromMe) {
           reply('Maaf, perintah ini hanya dapat dipakai oleh host!');
           return true;
@@ -665,7 +723,7 @@ export async function handler(message: WAMessage): Promise<any> {
     }
     if (!cmd) {
       if (autoReply && replies.isReply(body)) {
-        let repls = replies.getReply(body);
+        const repls = replies.getReply(body);
         if (repls !== false) {
           reply(repls);
         }
@@ -693,13 +751,12 @@ export async function handler(message: WAMessage): Promise<any> {
               client.sendMessage(from, buff, type, {
                 caption: '*XyZ BOT Cloud*',
                 quoted: replyMode,
-                mimetype: type == audio ? Mimetype.mp4Audio : njay.mime,
+                mimetype: type === audio ? Mimetype.mp4Audio : njay.mime,
               });
             }
             function sendSticker() {
               client.sendMessage(from, buff, sticker, {quoted: replyMode});
-
-                    }
+            }
             switch (njay.ext) {
               case 'mp4':
                 send(video);
@@ -735,17 +792,20 @@ export async function handler(message: WAMessage): Promise<any> {
       } else if ((body || '').startsWith('xreturn ')) {
         if (permission(['self', 'admin'])) return;
         let ctype = Function;
-        const AsyncFunction = Object.getPrototypeOf(async function () {})
-          .constructor;
+        const AsyncFunction = Object.getPrototypeOf(async () => {}).constructor;
         if (/await/.test(body)) ctype = AsyncFunction;
         const func = new ctype(
-              'print', 
-              Object.keys(client)[0], 
-              'from',
-              'message',
-              'body',
-              'require', 
-              !/^return /.test(body.slice(8)) && body.slice(8).split('\n').length === 1 ? 'return ' + body.slice(8) : body.slice(8));
+          'print',
+          Object.keys(client)[0],
+          'from',
+          'message',
+          'body',
+          'require',
+          !/^return /.test(body.slice(8)) &&
+          body.slice(8).split('\n').length === 1
+            ? 'return ' + body.slice(8)
+            : body.slice(8)
+        );
         let output;
         try {
           output = func(
@@ -761,7 +821,7 @@ export async function handler(message: WAMessage): Promise<any> {
               teks
                 .replace(
                   /^(async function|function|async).+\(.+?\).+{/,
-                  `case 'command':`
+                  "case 'command':"
                 )
                 .replace(/this\.(teks|url|args)/g, (_, teks) => {
                   switch (body) {
@@ -783,7 +843,7 @@ export async function handler(message: WAMessage): Promise<any> {
         }
       } else if ((body || '').startsWith('>> ')) {
         if (permission(['self', 'admin'])) return;
-        let exec = body.slice(3).replace(';', '').replace('&&', '');
+        const exec = body.slice(3).replace(';', '').replace('&&', '');
         child.exec(exec, (error: any, stdout: any, stderr: any) => {
           if (error) return reply('*[ERROR]*\n' + error.toString());
           if (stdout) return reply('*[STDOUT]*\n' + stdout.toString());
@@ -1032,12 +1092,12 @@ export async function handler(message: WAMessage): Promise<any> {
       } else if (pre('mimic')) {
         if (permission(['admin'])) return;
         if (isDisable(args[1]) || mentionedJidList()[0]) {
-          let target = mentionedJidList()[0] ? mentionedJidList()[0] : serial;
-          let i = mimics.indexOf(target);
+          const target = mentionedJidList()[0] ? mentionedJidList()[0] : serial;
+          const i = mimics.indexOf(target);
           mimics.splice(i, 1);
-          reply(`Mimic stopped!`);
+          reply('Mimic stopped!');
         } else if (isEnable(args[1]) || mentionedJidList()[0]) {
-          let target = mentionedJidList()[0] ? mentionedJidList()[0] : serial;
+          const target = mentionedJidList()[0] ? mentionedJidList()[0] : serial;
           mimics.push(target);
           reply('Mimic telah di tambahkan');
         } else {
@@ -1049,7 +1109,7 @@ export async function handler(message: WAMessage): Promise<any> {
           client
             .downloadAndSaveMediaMessage(getQuotedImage(), '../temp/' + msgId)
             .then(async res => {
-              const asu = child.fork('../lib/inspect.js');
+              const asu = child.fork('../lib/inspect.js', ['--no-warnings']);
               asu.send(res);
               asu.on('message', async (out: any) => {
                 let hasil = '*Lewd Detector*\n\n';
@@ -1179,7 +1239,7 @@ export async function handler(message: WAMessage): Promise<any> {
           );
         }
       } else if (pre('burn')) {
-        let query = getQuery('burn');
+        const query = getQuery('burn');
         if (!query) return reply('Maaf, perintah tidak valid');
         canvacord.burn(query).then(res => {
           client.sendMessage(from, res, image, {
@@ -1316,8 +1376,8 @@ export async function handler(message: WAMessage): Promise<any> {
       } else if (pre('fuse')) {
         if (!mentionedJidList()[0] || !mentionedJidList()[1])
           return reply('Maaf, perintah tidak valid');
-        let datax1 = await getPic(mentionedJidList()[0]);
-        let datax2 = await getPic(mentionedJidList()[1]);
+        const datax1 = await getPic(mentionedJidList()[0]);
+        const datax2 = await getPic(mentionedJidList()[1]);
         canvacord.fuse(datax1, datax2).then(res => {
           client.sendMessage(from, res, image, {
             filename: 'hasil.jpg',
@@ -1341,7 +1401,7 @@ export async function handler(message: WAMessage): Promise<any> {
             let hasil =
                 '*Hasil Pencarian PlayStore*\n-----------------------------------------\n\n',
               counter = 1;
-            for (let i of res) {
+            for (const i of res) {
               if (i.free) {
                 hasil += stripIndents`*Aplikasi ke-${counter}*
                         • Nama : ${i.title}
@@ -1371,8 +1431,8 @@ export async function handler(message: WAMessage): Promise<any> {
           let hasil =
               '*TextPro Scrapper*\n\ntotal tipe:*' + txtpro.length + '*\n',
             counter = 1;
-          for (let [key, vals] of txtpro) {
-            let val: any = vals;
+          for (const [key, vals] of txtpro) {
+            const val: any = vals;
             hasil += `${counter}. *${key}*\njumlah teks: ${val.type}\n`;
             counter++;
           }
@@ -1382,20 +1442,20 @@ export async function handler(message: WAMessage): Promise<any> {
           if (is_undefined(parsed.type))
             return reply('Maaf, tolong masukan tipe');
           let type = parsed.type.trim();
-          if (!textpro.hasOwnProperty(type))
+          if (!Object.prototype.hasOwnProperty.call(textpro, type))
             return reply('Maaf, tipe ini tidak terdaftar');
           type = textpro[type];
-          if (type.type == 2) {
+          if (type.type === 2) {
             if (is_undefined(parsed.top))
               return reply('Maaf, tolong masukan top');
             if (is_undefined(parsed.bot))
               return reply('Maaf, tolong masukan bot');
-            let top = parsed.top.trim(),
+            const top = parsed.top.trim(),
               bot = parsed.bot.trim();
             if (top.length > 50 || bot.length > 50)
               return reply('Maaf, teks terlalu panjang');
             scrap.textpro2input(type.link, top, bot).then(res => {
-              client.sendFileFromUrl(from, res, image, {
+              client.sendFileFromUrl(from, res!, image, {
                 quoted: replyMode,
                 caption: '_*Proccesing Sulkses #XyZ BOT*_',
               });
@@ -1403,10 +1463,10 @@ export async function handler(message: WAMessage): Promise<any> {
           } else {
             if (is_undefined(parsed.text))
               return reply('Maaf, tolong masukan text');
-            let text = parsed.text.trim();
+            const text = parsed.text.trim();
             if (text.length > 50) return reply('Maaf, teks terlalu panjang');
             scrap.textpro1input(type.link, text).then(res => {
-              client.sendFileFromUrl(from, res, image, {
+              client.sendFileFromUrl(from, res!, image, {
                 quoted: replyMode,
                 caption: '_*Proccesing Sulkses #XyZ BOT*_',
               });
@@ -1434,7 +1494,7 @@ export async function handler(message: WAMessage): Promise<any> {
           .search('tracks', query)
           .then((res: any) => {
             let found = false;
-            for (let i of res.collection) {
+            for (const i of res.collection) {
               if (i.downloadable && !found) {
                 found = i.uri;
               }
@@ -1532,9 +1592,10 @@ export async function handler(message: WAMessage): Promise<any> {
               hasil +
                 '-----------------------------------------\n*' +
                 prefix +
-                'imdb {Judul}* untuk informasi film selengkapnya')
+                'imdb {Judul}* untuk informasi film selengkapnya'
+            );
           } else {
-            for (let i of res.d) {
+            for (const i of res.d) {
               hasil += stripIndents`*Hasil Film ke-${counter}*
                         • Judul : ${i.l}
                         • Tahun : ${i.y}
@@ -1557,7 +1618,7 @@ export async function handler(message: WAMessage): Promise<any> {
         const res1 = await imdb.simpleSearch(query);
         if (typeof res1.d !== 'undefined') {
           function parseAll(array: string[], config?: any) {
-            if (typeof array == undefined) return 'Tidak Ada';
+            if (typeof array === undefined) return 'Tidak Ada';
             let hasil = array[0];
             if (config) hasil = array[0]![config];
             for (let i = 1; i < array.length; i++) {
@@ -1581,7 +1642,7 @@ export async function handler(message: WAMessage): Promise<any> {
                 • Director : \n${parseAll(res2.directors)}
                 • Bintang : \n${parseAll(res2.stars)}
                 • Story : \n${res2.story}
-                • Related : \n${parseAll(res2.related, 'name')}`
+                • Related : \n${parseAll(res2.related, 'name')}`;
           getBuffer(res2.poster).then(async res => {
             const type: any = await file_type.fromBuffer(res);
             client.sendMessage(from, res, image, {
@@ -1595,19 +1656,19 @@ export async function handler(message: WAMessage): Promise<any> {
           reply('Maaf, keyword *' + query + '* tidak ditemukan!');
         }
       } else if (pre('md5')) {
-        let query = getQuery('md5');
+        const query = getQuery('md5');
         sendText('*MD5*\n' + crypto.MD5(query).toString());
       } else if (pre('sha1')) {
-        let query = getQuery('sha1');
+        const query = getQuery('sha1');
         sendText('*SHA1*\n' + crypto.SHA1(query).toString());
       } else if (pre('sha3')) {
-        let query = getQuery('sha3');
+        const query = getQuery('sha3');
         sendText('*SHA3*\n' + crypto.SHA3(query).toString());
       } else if (pre('sha256')) {
-        let query = getQuery('sha256');
+        const query = getQuery('sha256');
         sendText('*SHA256*\n' + crypto.SHA256(query).toString());
       } else if (pre('sha512')) {
-        let query = getQuery('sha512');
+        const query = getQuery('sha512');
         sendText('*SHA512*\n' + crypto.SHA512(query).toString());
       } else if (pre('nulis') || pre('tulis')) {
         const text = quotedMsgObj() ? getQuotedText() : getQuery('nulis');
@@ -1615,7 +1676,7 @@ export async function handler(message: WAMessage): Promise<any> {
           return reply(
             `Maaf, perintah tidak valid!\n\ncontoh: *${prefix}nulis [teks]*`
           );
-        let lineBreaks: any = matchGroup.matchAll(text, /\n/gi);
+        const lineBreaks: any = matchGroup.matchAll(text, /\n/gi);
         try {
           const nulis = async (word: string) => {
             const text = wrap(word, {width: 60});
@@ -1647,9 +1708,9 @@ export async function handler(message: WAMessage): Promise<any> {
             if (lineBreaks.length <= 19) {
               await nulis(text);
             } else if (lineBreaks.length <= 38) {
-              let udud12 = text.substring(0, lineBreaks[19].index);
+              const udud12 = text.substring(0, lineBreaks[19].index);
               await nulis(udud12);
-              let udud23 = text.substring(
+              const udud23 = text.substring(
                 lineBreaks[19].index,
                 lineBreaks[lineBreaks.length - 1].index
               );
@@ -1661,9 +1722,9 @@ export async function handler(message: WAMessage): Promise<any> {
             if (text.length <= 1055) {
               await nulis(text);
             } else if (text.length <= 2110) {
-              let udud12 = text.substring(0, 1055);
+              const udud12 = text.substring(0, 1055);
               await nulis(udud12);
-              let udud23 = text.substring(1056, 2110);
+              const udud23 = text.substring(1056, 2110);
               await nulis(udud23);
             } else {
               return reply('Maaf, jumlah kata melebihi 2 lembar');
@@ -1741,7 +1802,7 @@ export async function handler(message: WAMessage): Promise<any> {
         }
       } else if (pre('translate')) {
         if (!args[1]) return;
-        var codelang = args[1];
+        const codelang = args[1];
         const text = quotedMsgObj()
           ? getQuotedText()
           : cmd.slice(11 + codelang.length);
@@ -1765,9 +1826,9 @@ export async function handler(message: WAMessage): Promise<any> {
             axios
               .get('https://animechanapi.xyz/api/quotes?anime=' + anime)
               .then(({data}) => {
-                let quote = data.data[0].quote;
-                let char = data.data[0].character;
-                let anime = data.data[0].anime;
+                const quote = data.data[0].quote;
+                const char = data.data[0].character;
+                const anime = data.data[0].anime;
                 reply(`"${quote}"\n\n${char} from ${anime}`);
               })
               .catch(() => {
@@ -1779,9 +1840,9 @@ export async function handler(message: WAMessage): Promise<any> {
             axios
               .get('https://animechanapi.xyz/api/quotes?char=' + char)
               .then(({data}) => {
-                let quote = data.data[0].quote;
-                let char = data.data[0].character;
-                let anime = data.data[0].anime;
+                const quote = data.data[0].quote;
+                const char = data.data[0].character;
+                const anime = data.data[0].anime;
                 reply(`"${quote}"\n\n${char} from ${anime}`);
               })
               .catch(() => {
@@ -1792,9 +1853,9 @@ export async function handler(message: WAMessage): Promise<any> {
           axios
             .get('https://animechanapi.xyz/api/quotes/random')
             .then(({data}) => {
-              let quote = data.data[0].quote;
-              let char = data.data[0].character;
-              let anime = data.data[0].anime;
+              const quote = data.data[0].quote;
+              const char = data.data[0].character;
+              const anime = data.data[0].anime;
               reply(`"${quote}"\n\n${char} from ${anime}`);
             })
             .catch(err => {
@@ -1812,9 +1873,9 @@ export async function handler(message: WAMessage): Promise<any> {
           })
           .catch((err: any) => console.log(err));
       } else if (pre('mock')) {
-        let query = getQuery('mock');
-        let filtered: any = filterWord(query);
-        if (filtered != false) return reply(filtered);
+        const query = getQuery('mock');
+        const filtered: any = filterWord(query);
+        if (filtered !== false) return reply(filtered);
         const letters = query.split('');
         for (
           let i = 0;
@@ -1825,9 +1886,9 @@ export async function handler(message: WAMessage): Promise<any> {
         }
         sendText(letters.join(''));
       } else if (pre('reverse')) {
-        let query = getQuery('reverse');
-        let filtered: any = filterWord(query);
-        if (filtered != false) return reply(filtered);
+        const query = getQuery('reverse');
+        const filtered: any = filterWord(query);
+        if (filtered !== false) return reply(filtered);
         sendText(query.split('').reverse().join(''));
       } else if (pre('cloud')) {
         if (secondParam('add')) {
@@ -1853,8 +1914,7 @@ export async function handler(message: WAMessage): Promise<any> {
           removeCloud(serial)
             .then(res => reply(res))
             .catch(err => reply(err));
-
-            }else if(secondParam('help')){
+        } else if (secondParam('help')) {
           reply(template.cloudHelp());
         } else {
           findCloud(serial)
@@ -1865,7 +1925,7 @@ export async function handler(message: WAMessage): Promise<any> {
                 client.sendMessage(from, buff, type, {
                   caption: '*XyZ BOT Cloud*',
                   quoted: replyMode,
-                  mimetype: type == audio ? Mimetype.mp4Audio : njay.mime,
+                  mimetype: type === audio ? Mimetype.mp4Audio : njay.mime,
                 });
               }
               function sendSticker() {
@@ -1904,13 +1964,13 @@ export async function handler(message: WAMessage): Promise<any> {
         }
       } else if (pre('image')) {
         if (!args[1]) return reply('Harap masukan text pencarian google image');
-        let query = getQuery('image');
+        const query = getQuery('image');
         if (!query) return reply('Harap masukan text pencarian google image');
-        let filtered: any = filterWord(query);
-        if (filtered != false) return reply(filtered);
-        gImages(query, function (err: any, res: any) {
+        const filtered: any = filterWord(query);
+        if (filtered !== false) return reply(filtered);
+        gImages(query, (err: any, res: any) => {
           if (err) return reply('Maaf, hasil tidak ada atau sedang error');
-          if (!res || !res[0].hasOwnProperty('url'))
+          if (!res || !Object.prototype.hasOwnProperty.call(res[0], 'url'))
             return reply('Gambar tidak ditemukan!');
           return client
             .sendFileFromUrl(from, res[0].url, image, {
@@ -1920,7 +1980,7 @@ export async function handler(message: WAMessage): Promise<any> {
             .catch(() => reply('Maaf, gambar tsb error'));
         });
       } else if (pre('qrcode')) {
-        let qrcodes = getQuery('qrcode');
+        const qrcodes = getQuery('qrcode');
         if (!qrcodes) return;
         getBuffer(
           `https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=${qrcodes}`
@@ -1935,12 +1995,12 @@ export async function handler(message: WAMessage): Promise<any> {
       } else if (pre('igstalk')) {
         let usrname = args[1];
         if (!usrname) return;
-        if (usrname.substr(0, 1) == '@') {
+        if (usrname.substr(0, 1) === '@') {
           usrname = usrname.replace('@', '');
         }
         igstalk(usrname)
           .then(res => {
-            let hasil = stripIndents`_*「 Instagram Stalker 」*_
+            const hasil = stripIndents`_*「 Instagram Stalker 」*_
                 • _username : *${res.username}*_
                 • _nama : *${res.fullname}*_
                 • _post : *${formatK(res.post)} post*_
@@ -2040,13 +2100,13 @@ export async function handler(message: WAMessage): Promise<any> {
         scrap
           .ss(web)
           .then(res => {
-            client.sendMessage(from, res, image, {
+            client.sendMessage(from, res!, image, {
               filename: 'ss.jpeg',
               caption: '_*「 XyZ BOT Automation 」*_',
               quoted: replyMode,
             });
           })
-          .catch(() => reply(`[GAGAL] url tidak valid!`));
+          .catch(() => reply('[GAGAL] url tidak valid!'));
       } else if (pre('ss2') || pre('screenshot2')) {
         let web = quotedMsgObj() ? getQuotedText() : args[1];
         if (!web)
@@ -2065,12 +2125,12 @@ export async function handler(message: WAMessage): Promise<any> {
               quoted: replyMode,
             });
           })
-          .catch(() => reply(`[GAGAL] url tidak valid!`));
+          .catch(() => reply('[GAGAL] url tidak valid!'));
       } else if (pre('group')) {
         if (permission(['group'])) return;
         const hasil = stripIndents`_*「 Group Information 」*_
             • _name : *${groupName}*_
-            • _creator : @${groupMetadata.owner.replace('@c.us','')}_
+            • _creator : @${groupMetadata.owner.replace('@c.us', '')}_
             • _dibuat : ${moment(groupMetadata.creation * 1000).fromNow()}_
             • _admins : *${groupAdmins.length}*_
             • _members : *${groupMembers.length}*_
@@ -2080,7 +2140,7 @@ export async function handler(message: WAMessage): Promise<any> {
             ----------------------------------------
             ${groupDesc}
             ----------------------------------------
-            _*「 XyZ BOT Automation 」*_`
+            _*「 XyZ BOT Automation 」*_`;
         getPic(from).then(res => {
           client.sendMessage(from, res, image, {
             caption: hasil,
@@ -2220,14 +2280,14 @@ export async function handler(message: WAMessage): Promise<any> {
           reply('Sukses menambahkan ke filter!');
         } else if (secondParam('remove')) {
           if (!args[2]) return;
-          let i = arryOfWords.indexOf(args[2]);
+          const i = arryOfWords.indexOf(args[2]);
           arryOfWords.splice(i, 1);
           db.push('/arryOfWords', arryOfWords, true);
           reply('Sukses remove kata dari filter!');
         } else {
-          let hasil = `*XyZ BOT Filters*\n\n`,
+          let hasil = '*XyZ BOT Filters*\n\n',
             counter = 1;
-          for (let i of arryOfWords) {
+          for (const i of arryOfWords) {
             hasil += `${counter}. ${i}\n`;
             counter++;
           }
@@ -2270,7 +2330,7 @@ export async function handler(message: WAMessage): Promise<any> {
         hasil = hasil.replace(/%%%/g, '```');
         reply(hasil);
       } else if (pre('yts') || pre('ytsearch')) {
-        let dict = pre('yts') ? getQuery('yts') : getQuery('ytsearch');
+        const dict = pre('yts') ? getQuery('yts') : getQuery('ytsearch');
         if (!dict)
           return reply(
             'Maaf, perintah tidak valid\n\nharap masukan query yotube!'
@@ -2281,7 +2341,7 @@ export async function handler(message: WAMessage): Promise<any> {
           })
           .catch(err => reply(err));
       } else if (pre('lirik') || pre('lyric')) {
-        let song = getQuery('lirik');
+        const song = getQuery('lirik');
         if (!song)
           return reply(
             `Maaf, perintah tidak valid, contoh :\n\n*${prefix}lirik [judul lagu]*`
@@ -2299,13 +2359,13 @@ export async function handler(message: WAMessage): Promise<any> {
       } else if (pre('lang')) {
         try {
           const lang = args[1];
-          let langText = isQuotedText
+          const langText = isQuotedText
             ? getQuotedText()
             : cmd.slice(6 + lang.length);
           if (!lang || !langText) return;
           if (langText.length >= 250) return sendText('Teks Kepanjangan :(');
-          var gtts = new gTTs(langText, lang);
-          gtts.save(`../temp/${msgId}.m4a`, function () {
+          const gtts = new gTTs(langText, lang);
+          gtts.save(`../temp/${msgId}.m4a`, () => {
             client.sendMessage(
               from,
               fs.readFileSync(`../temp/${msgId}.m4a`),
@@ -2327,14 +2387,14 @@ export async function handler(message: WAMessage): Promise<any> {
           .catch(err => reply(err));
       } else if (pre('cmd')) {
         if (permission(['group', 'admingroup'])) return;
-        let formatted = getQuery('cmd').trim();
-        let spliter = formatted.split('|');
-        let cmd = args[1];
+        const formatted = getQuery('cmd').trim();
+        const spliter = formatted.split('|');
+        const cmd = args[1];
         if (!cmd) return reply('Maaf, perintah tidak valid');
-        let result = spliter[1];
+        const result = spliter[1];
         if ((await groups.getComs(chatId)) > 25)
           return reply('Maaf, custom command hanya boleh 25 perintah');
-        if (isMedia || type == 'document') {
+        if (isMedia || type === 'document') {
           if (fileSize(false) >= 10485760)
             return reply('Maaf, file tidak boleh melebihi 10mb!');
           const mime: any = message.message ?? [type];
@@ -2393,7 +2453,7 @@ export async function handler(message: WAMessage): Promise<any> {
         });
       } else if (pre('bass')) {
         if (isQuotedAudio) {
-          let dB = args[1] ? args[1] : 10;
+          const dB = args[1] ? args[1] : 10;
           client.downloadMediaMessage(getQuotedAudio()).then(mediaData => {
             ffmpeg(buffer2Stream(mediaData))
               .audioFilter('equalizer=f=40:width_type=h:width=50:g=' + dB)
@@ -2442,7 +2502,7 @@ export async function handler(message: WAMessage): Promise<any> {
         if (!isGroupMsg) return reply('Maaf, hanya bisa di lakukan di group!');
         if (!isGroupAdmins)
           return reply('Maaf, hanya bisa di lakukan oleh admin group!');
-        let cmd = args[1];
+        const cmd = args[1];
         if (!cmd) return reply('Maaf, perintah tidak valid');
         groups
           .rmvCmd(chatId, cmd)
@@ -2460,9 +2520,9 @@ export async function handler(message: WAMessage): Promise<any> {
           .catch(() => reply(`*${query}*\n\ntidak ditemukan di wikipedia!`));
       } else if (pre('cekresi')) {
         if (args.length <= 3) return;
-        let kurir = args[2];
-        let resi = args[1];
-        let courir = [
+        const kurir = args[2];
+        const resi = args[1];
+        const courir = [
           'jne',
           'pos',
           'jnt',
@@ -2497,16 +2557,15 @@ export async function handler(message: WAMessage): Promise<any> {
                   hasil += `\n├> Diterima Oleh : ${bn.received.name}\n├> Tanggal : ${bn.received.date}\n├> Status : ${bn.received.status}`;
                 }
                 hasil += '\n├────────────────\n├> Tracking : ';
-                let track = bn.tracking;
+                const track = bn.tracking;
                 Object.keys(track)
                   .reverse()
-                  .forEach(function (i) {
+                  .forEach(i => {
                     hasil += `\n├────────────────\n├> Tanggal   : ${track[i].date}\n├> Deskripsi : ${track[i].desc}\n├> Status    : ${track[i].status}\n├────────────────`;
                   });
                 hasil += '\n╰──[ xYz WhatsApp Bot ]───';
                 sendText(hasil);
-                        
-                    } else {
+              } else {
                 sendText('Kode resi invalid / kadaluarsa');
               }
             })
@@ -2555,7 +2614,7 @@ export async function handler(message: WAMessage): Promise<any> {
             )
             .then(res => {
               obfuscate(true, res).then((res: any) => {
-                if (res.type == 'file') {
+                if (res.type === 'file') {
                   client.sendMessage(
                     from,
                     fs.readFileSync(res.path),
@@ -2576,7 +2635,7 @@ export async function handler(message: WAMessage): Promise<any> {
         } else {
           const code = getQuery('obfuscate');
           obfuscate(false, undefined, code).then((res: any) => {
-            if (res.type == 'file') {
+            if (res.type === 'file') {
               client.sendMessage(from, fs.readFileSync(res.path), document, {
                 filename: 'result.js',
                 caption: 'obfucate result',
@@ -2591,7 +2650,7 @@ export async function handler(message: WAMessage): Promise<any> {
         }
       } else if (pre('bmkg')) {
         axios.get('https://data.bmkg.go.id/autogempa.xml').then(res => {
-          parseString(res.data, function (err: any, result: any) {
+          parseString(res.data, (err: any, result: any) => {
             result = result.Infogempa.gempa[0];
             const hasils = stripIndents`_*Informasi Gempa BMKG*_
                     ----------------------------------------
@@ -2608,7 +2667,7 @@ export async function handler(message: WAMessage): Promise<any> {
                     • Lokasi 5 : ${result.Wilayah5}
                     • Potensi : ${result.Potensi}
                     ----------------------------------------
-                    _*「 XyZ BOT Automation 」*_`
+                    _*「 XyZ BOT Automation 」*_`;
             sendText(hasils);
           });
         });
@@ -2617,29 +2676,29 @@ export async function handler(message: WAMessage): Promise<any> {
         let onlen: any = client.chats.get(from).presences;
         if (!onlen) return reply('Tidak ada yang sedang online');
         onlen = Object.keys(onlen);
-        for (let [a, b] of onlen) {
+        for (const [a, b] of onlen) {
           console.log(a, b);
         }
       } else if (pre('count')) {
         if (permission(['self'])) return;
         if (secondParam('add')) {
           if (!args[2]) return;
-          let anjay = countAdd(args[2]);
+          const anjay = countAdd(args[2]);
           reply(anjay);
         } else if (secondParam('remove')) {
           if (!args[2]) return;
-          let anjay = countRemove(args[2]);
+          const anjay = countRemove(args[2]);
           reply(anjay);
         } else if (secondParam('admin')) {
           if (!args[2]) return;
-          let anjay = setCountAsAdmin(args[2]);
+          const anjay = setCountAsAdmin(args[2]);
           reply(anjay);
         } else if (secondParam('member')) {
           if (!args[2]) return;
-          let anjay = setCountAsMember(args[2]);
+          const anjay = setCountAsMember(args[2]);
           reply(anjay);
         } else {
-          let hasil = countCmd();
+          const hasil = countCmd();
           sendText(hasil);
         }
       } else if (pre('reply')) {
@@ -2653,21 +2712,21 @@ export async function handler(message: WAMessage): Promise<any> {
         } else if (secondParam('add')) {
           const query = getQuery('reply add');
           if (!args[2] || !query) return;
-          let anjay = replies.addReply(args[2], query.trim());
+          const anjay = replies.addReply(args[2], query.trim());
           reply(anjay);
         } else if (secondParam('remove')) {
           if (!args[2]) return;
-          let anjay = replies.removeReply(args[2]);
+          const anjay = replies.removeReply(args[2]);
           reply(anjay);
         } else {
-          let hasil = replies.allReply();
+          const hasil = replies.allReply();
           sendText(hasil);
         }
       } else if (pre('google')) {
-        var googleQuery = getQuery('google');
-        let filtered: any = filterWord(googleQuery);
-        if (filtered != false) return reply(filtered);
-        if (googleQuery == undefined || googleQuery == ' ') return;
+        const googleQuery = getQuery('google');
+        const filtered: any = filterWord(googleQuery);
+        if (filtered !== false) return reply(filtered);
+        if (googleQuery === undefined || googleQuery === ' ') return;
         google({
           query: googleQuery,
           disableConsole: true,
@@ -2683,8 +2742,8 @@ export async function handler(message: WAMessage): Promise<any> {
             console.log(e);
           });
       } else if (pre('refrence') || pre('github') || pre('stackoverflow')) {
-        var googleQuery = getQuery('refrence');
-        if (googleQuery == undefined || googleQuery == ' ') return;
+        const googleQuery = getQuery('refrence');
+        if (googleQuery === undefined || googleQuery === ' ') return;
         google({
           query: googleQuery,
           disableConsole: true,
@@ -2692,7 +2751,7 @@ export async function handler(message: WAMessage): Promise<any> {
           limit: 2,
         })
           .then((results: any) => {
-            let vars = results[0];
+            const vars = results[0];
             sendText(
               `_*Refrence Result*_\n\n• Judul : \n${vars.title}\n\n• Deskripsi : \n${vars.snippet}\n\n• Link : \n${vars.link}\n\n_*「 XyZ BOT Automation 」*_`
             );
@@ -2701,7 +2760,7 @@ export async function handler(message: WAMessage): Promise<any> {
             console.log(e);
           });
       } else if (pre('cuaca')) {
-        let query = getQuery('cuaca');
+        const query = getQuery('cuaca');
         if (!query) return reply('Mohon masukan nama kota');
         cuaca(query)
           .then(res => {
@@ -2712,7 +2771,7 @@ export async function handler(message: WAMessage): Promise<any> {
         const query = quotedMsgObj() ? getQuotedText() : getQuery('ttp');
         if (query.length > 50) return reply('Teks kepanjangan :(');
         if (!query) return reply('Mohon masukan teks yang ingin di konversi');
-        let text = wrap(query, {width: 10}).toUpperCase();
+        const text = wrap(query, {width: 10}).toUpperCase();
         if (text.split('\n').length > 6)
           return reply('Garis baru text terlalu banyak!');
         let mediaData = text2png(text, {
@@ -2737,7 +2796,7 @@ export async function handler(message: WAMessage): Promise<any> {
       } else if (pre('ttd')) {
         const query = getQuery('ttd');
         if (!query) return reply('Mohon masukan teks yang ingin di konversi');
-        let text = wrap(query, {width: 8});
+        const text = wrap(query, {width: 8});
         if (text.split('\n').length > 1)
           return reply('Tidak manusiawi tanda tangan 2 baris');
         let mediaData = text2png(text, {
@@ -2784,12 +2843,12 @@ export async function handler(message: WAMessage): Promise<any> {
           setting.restartState = true;
           setting.restartId = from;
           db.push('/setting', setting, true);
-          pm2.restart(pm2Id, (err) => {
+          pm2.restart(pm2Id, err => {
             if (err) console.log(err);
           });
         } else if (secondParam('block')) {
           if (args.length >= 3) {
-            let block = `${args[2]}@s.whatsapp.net`;
+            const block = `${args[2]}@s.whatsapp.net`;
             client.blockUser(block, 'add').then(() => {
               reply(`Sukses blok ${args[2]}!`);
             });
@@ -2797,14 +2856,14 @@ export async function handler(message: WAMessage): Promise<any> {
           }
         } else if (secondParam('unblock')) {
           if (args.length >= 3) {
-            let unblock = `${args[2]}@s.whatsapp.net`;
+            const unblock = `${args[2]}@s.whatsapp.net`;
             await client.blockUser(unblock, 'remove').then(() => {
               reply(`Sukses unblok ${args[2]}!`);
             });
           }
         } else if (secondParam('leaveall')) {
           reply('Genosida di mulai!');
-          let arrOfGroups = await client.getAllGroups();
+          const arrOfGroups = await client.getAllGroups();
           for (const gid of arrOfGroups) {
             const gids = gid.jid;
             if (!gid.metadata!.announce) {
@@ -2818,10 +2877,10 @@ export async function handler(message: WAMessage): Promise<any> {
           sendText('sukses!');
         } else if (secondParam('clearall')) {
           reply('Genosida di mulai!');
-          let chatsny = await client.getAllPrivate();
-          let arrOfGroups = await client.getAllGroups();
+          const chatsny = await client.getAllPrivate();
+          const arrOfGroups = await client.getAllGroups();
           for (const groupIds of arrOfGroups) {
-            let gids: any = groupIds.jid;
+            const gids: any = groupIds.jid;
             if (!gids.metadata.announce) {
               await client.modifyChat(gids, ChatModification.delete);
               await client.groupLeave(gids);
@@ -2836,7 +2895,7 @@ export async function handler(message: WAMessage): Promise<any> {
           sendText('sukses!');
         } else if (secondParam('chatclear')) {
           reply('Genosida di mulai!');
-          let chatsny = await client.getAllChats();
+          const chatsny = await client.getAllChats();
           for (const chats of chatsny) {
             client.modifyChat(chats.jid, ChatModification.clear);
           }
@@ -2891,7 +2950,7 @@ export async function handler(message: WAMessage): Promise<any> {
 
             *「 SELF STATUS 」*
             • _prefix : *「 ${prefix} 」*_
-            • _unsend : *${formatOnOff(unSend.includes(serial))}*_
+            • _unsend : *${formatOnOff(setting.unSend.includes(serial))}*_
             • _upublic : *${formatOnOff(setting.universalPublic)}*_
             • _autoread : *${formatOnOff(autoRead)}*_
             • _autoreply : *${formatOnOff(autoReply)}*_
@@ -2900,14 +2959,14 @@ export async function handler(message: WAMessage): Promise<any> {
             • _freplyjid : *${setting.fakeJid}*_
             • _freplytext :_ \n\n${setting.fakeText} 
             
-            _*「 XyZ BOT Automation 」*_`
+            _*「 XyZ BOT Automation 」*_`;
         reply(hasil);
       } else if (pre('bc')) {
         if (permission(['self'])) return;
-        let dict = getQuery('bc');
-        let chats = client.chats.all();
+        const dict = getQuery('bc');
+        const chats = client.chats.all();
         if ((isMedia && !isQuotedVideo) || isQuotedImage) {
-          let buff = await client.downloadMediaMessage(getQuotedImage());
+          const buff = await client.downloadMediaMessage(getQuotedImage());
           for (const _ of chats) {
             client.sendMessage(_.jid, buff, image, {caption: dict});
           }
@@ -2923,12 +2982,12 @@ export async function handler(message: WAMessage): Promise<any> {
         await client.modifyChat(chatId, ChatModification.delete);
         await client.groupLeave(chatId);
       } else if (pre('bitly')) {
-        let url = getQuery('bitly');
+        const url = getQuery('bitly');
         if (!url) return reply('Maaf, mohon masukan url untuk dishort');
         bitly
           .shorten(url)
           .then((bits: any) => {
-            reply((bits.link += `\n\n_*「 XyZ BOT Automation 」*_`));
+            reply((bits.link += '\n\n_*「 XyZ BOT Automation 」*_'));
           })
           .catch(() => reply('Link tidak valid!'));
       } else if (pre('creator') || pre('owner')) {
@@ -2937,7 +2996,7 @@ export async function handler(message: WAMessage): Promise<any> {
         if (args.length >= 2) {
           let url = args[1];
           if (!url.match(new RegExp('https://', 'gi'))) url = 'https://' + url;
-          var videoid = url.match(
+          const videoid = url.match(
             /(?:https?:\/{2})?(?:w{3}\.)?youtu(?:be)?\.(?:com|be)(?:\/watch\?v=|\/)([^\s&]+)/
           );
           if (!videoid) {
@@ -2970,7 +3029,7 @@ export async function handler(message: WAMessage): Promise<any> {
                         'Videonya terlalu panjang gan, coba yang lain :v'
                       );
                     } else {
-                      let stream = ytdl(videoid[1], {
+                      const stream = ytdl(videoid[1], {
                         quality: 'highestaudio',
                         requestOptions: {
                           headers: {
@@ -3017,13 +3076,13 @@ export async function handler(message: WAMessage): Promise<any> {
           );
         }
       } else if (pre('imp3')) {
-        let query = getQuery('imp3');
+        const query = getQuery('imp3');
         if (!query)
           return sendText('Mohon masukan text untuk instant search ytmp3');
         sendText('Tunggu sebentar ya kaka :D');
         imp3(query)
           .then(res => {
-            if (res.hasOwnProperty('title'))
+            if (Object.prototype.hasOwnProperty.call(res, 'title'))
               sendText(
                 `*YTDownloader*\n\n• Judul : ${res.title}\n• Durasi : ${res.time}`
               );
@@ -3055,7 +3114,7 @@ export async function handler(message: WAMessage): Promise<any> {
                 url: hasil,
                 responseType: 'arraybuffer',
               }).then(res => {
-                if (res.headers['content-type'] == Mimetype.mp4) {
+                if (res.headers['content-type'] === Mimetype.mp4) {
                   client.sendMessage(from, res.data, video, {
                     caption: '_*「 XyZ BOT Automation 」*_',
                     quoted: replyMode,
@@ -3078,8 +3137,8 @@ export async function handler(message: WAMessage): Promise<any> {
         pre('ytmp4') ||
         pre('ytvideo')
       ) {
-        if (args.length == 2) {
-          let url = args[1];
+        if (args.length === 2) {
+          const url = args[1];
           if (!url) return reply('Maaf, perintah tidak valid');
           if (!url.match(isUrl))
             return reply('Maaf, url yang kamu kirim tidak valid');
@@ -3152,7 +3211,7 @@ export async function handler(message: WAMessage): Promise<any> {
           })
           .catch(() => reply('Maaf, url tidak valid'));
       } else if (pre('news')) {
-        let newsStr = getQuery('news');
+        const newsStr = getQuery('news');
         if (!newsStr)
           return reply(
             'Maaf, perintah tidak valid\n\nMohon masukan berita yang akan dicari'
@@ -3164,7 +3223,7 @@ export async function handler(message: WAMessage): Promise<any> {
                 • Judul : ${res.title}
                 • Link : ${res.url}
 
-                _*XyZ BOT*_`
+                _*XyZ BOT*_`;
             client.sendFileFromUrl(from, res.img, image, {
               filename: 'image.jpg',
               caption: formated,
@@ -3174,7 +3233,7 @@ export async function handler(message: WAMessage): Promise<any> {
           .catch(err => reply(err));
       } else if (pre('kucing')) {
         const q2 = Math.floor(Math.random() * 900) + 300;
-        let q3 = Math.floor(Math.random() * 900) + 300;
+        const q3 = Math.floor(Math.random() * 900) + 300;
         client.sendFileFromUrl(
           from,
           'http://placekitten.com/' + q3 + '/' + q2,
@@ -3195,7 +3254,7 @@ export async function handler(message: WAMessage): Promise<any> {
         });
       } else if (pre('corona')) {
         function intl(str: number) {
-          var nf = Intl.NumberFormat();
+          const nf = Intl.NumberFormat();
           return nf.format(str);
         }
         if (args[1]) {
@@ -3208,9 +3267,9 @@ export async function handler(message: WAMessage): Promise<any> {
             return axios
               .get('https://indonesia-covid-19.mathdro.id/api/provinsi/')
               .then(({data}) => {
-                var founded = false;
+                let founded = false;
                 data.data.find((i: any) => {
-                  if (i.provinsi.toLowerCase() == province) {
+                  if (i.provinsi.toLowerCase() === province) {
                     founded = true;
                     return reply(stripIndents`_*「 Kasus COVID19 di ${
                       i.provinsi
@@ -3234,7 +3293,7 @@ export async function handler(message: WAMessage): Promise<any> {
           }
         } else {
           corona()
-            .then(hasilCorona =>sendText(hasilCorona))
+            .then(hasilCorona => sendText(hasilCorona))
             .catch((err: any) => {
               console.log(err);
             });
@@ -3317,7 +3376,7 @@ export async function handler(message: WAMessage): Promise<any> {
               .catch(err => reply(err));
           });
         } else {
-          sendText(`Maaf, hanya mendukung gambar, audio, dan video!`);
+          sendText('Maaf, hanya mendukung gambar, audio, dan video!');
         }
       } else if (pre('anime')) {
         const animename = getQuery('anime');
@@ -3336,10 +3395,10 @@ export async function handler(message: WAMessage): Promise<any> {
           .catch((err: any) => reply(err));
       } else if (pre('quoteit')) {
         if (!body.includes('|')) return reply('Maaf, perintah tidak valid');
-        let form = getQuery('quoteit');
-        let formated = form.split('|');
-        let maker = formated[0].trim();
-        let quote = formated[1].trim();
+        const form = getQuery('quoteit');
+        const formated = form.split('|');
+        const maker = formated[0].trim();
+        const quote = formated[1].trim();
         if (quote.length > 100) return reply('Text kepanjangan :)');
         if (!form || !maker || !quote)
           return reply('Maaf, perintah tidak valid');
@@ -3357,8 +3416,7 @@ export async function handler(message: WAMessage): Promise<any> {
       } else if (pre('quote') || pre('quotes')) {
         const getBijak = await quotes();
         reply(getBijak);
-
-        } else if (pre('compress')) {
+      } else if (pre('compress')) {
         if (isMedia || isQuotedImage) {
           client.downloadMediaMessage(getQuotedImage()).then(gambar => {
             processImg(gambar);
@@ -3370,7 +3428,7 @@ export async function handler(message: WAMessage): Promise<any> {
         }
         async function processImg(gambar: Buffer) {
           const images = await Jimp.read(gambar);
-          images.quality(55).write(`../temp/${msgId}.jpg`, function (err) {
+          images.quality(55).write(`../temp/${msgId}.jpg`, err => {
             if (err) console.log(err);
             client.sendMessage(
               from,
@@ -3410,10 +3468,10 @@ export async function handler(message: WAMessage): Promise<any> {
       } else if (pre('memegen')) {
         async function processImg(buffer: Buffer, body: string) {
           if (!body.includes('|')) return reply('Maaf, perintah tidak valid');
-          let form = getQuery('memegen');
-          let formated = form.split('|');
-          let maker = formated[0].trim();
-          let quote = formated[1].trim();
+          const form = getQuery('memegen');
+          const formated = form.split('|');
+          const maker = formated[0].trim();
+          const quote = formated[1].trim();
           if (!form || !maker || !quote)
             return reply('Maaf, perintah tidak valid');
           return canvacord
@@ -3460,7 +3518,7 @@ export async function handler(message: WAMessage): Promise<any> {
         }
       } else if (pre('memegen2')) {
         async function processImg(buffer: Buffer) {
-          let query = getQuery('memegen2');
+          const query = getQuery('memegen2');
           if (!query) return reply('Maaf, perintah tidak valid');
           return canvacord
             .memegen2(buffer, query)
@@ -3535,13 +3593,17 @@ export async function handler(message: WAMessage): Promise<any> {
       } else if (pre('unsend')) {
         if (permission(['self'])) return;
         if (isEnable(args[1])) {
-          if (unSend.includes(from)) return reply('antiDelete sudah aktif!');
-          unSend.push(from);
+          if (setting.unSend.includes(from))
+            return reply('antiDelete sudah aktif!');
+          setting.unSend.push(from);
+          db.push('/setting', setting, true);
           reply(debugWM + 'antiDelete mode enabled!');
         } else if (isDisable(args[1])) {
-          if (!unSend.includes(from)) return reply('antiDelete belum aktif!');
-          const index = unSend.indexOf(from);
-          unSend.splice(index, 1);
+          if (!setting.unSend.includes(from))
+            return reply('antiDelete belum aktif!');
+          const index = setting.unSend.indexOf(from);
+          setting.unSend.splice(index, 1);
+          db.push('/setting', setting, true);
           reply(debugWM + 'antiDelete mode disabled!');
         } else {
           reply('Maaf, perintah tidak valid');
@@ -3593,8 +3655,7 @@ export async function handler(message: WAMessage): Promise<any> {
               reply(debugWM + 'sukses add public!');
             }
           }
-
-            }
+        }
       } else if (pre('log')) {
         if (permission(['admin'])) return;
         if (isEnable(args[1])) {
@@ -3651,7 +3712,7 @@ export async function handler(message: WAMessage): Promise<any> {
       } else if (pre('eval')) {
         try {
           if (permission(['admin'])) return;
-          let exec = getQuery('eval').trim();
+          const exec = getQuery('eval').trim();
           eval(
             '(async () => {' + exec + '})().catch(err => reply(err.toString()))'
           );
@@ -3660,7 +3721,7 @@ export async function handler(message: WAMessage): Promise<any> {
         }
       } else if (pre('exec')) {
         if (permission(['admin'])) return;
-        let exec = getQuery('exec').trim();
+        const exec = getQuery('exec').trim();
         child.exec(exec, (error: any, stdout: any, stderr: any) => {
           if (error) return reply('*[ERROR]*\n' + error.toString());
           if (stdout) return reply('*[STDOUT]*\n' + stdout.toString());
@@ -3670,7 +3731,7 @@ export async function handler(message: WAMessage): Promise<any> {
       } else if (pre('getobj')) {
         if (permission(['admin'])) return;
         try {
-          let exec = getQuery('getobj').trim();
+          const exec = getQuery('getobj').trim();
           reply(require('util').inspect(eval(exec), false, null));
         } catch (error) {
           reply('[ERROR]\n\n' + error.toString());
@@ -3686,7 +3747,7 @@ export async function handler(message: WAMessage): Promise<any> {
               scrap
                 .webp2mp4('../temp/' + msgId + '.webp')
                 .then(res => {
-                  client.sendFileFromUrl(from, res, video, {
+                  client.sendFileFromUrl(from, res!, video, {
                     filename: 'hasil.mp4',
                     caption: '_*Processing Sukses! #XyZ BOT*_',
                     quoted: replyMode,
@@ -3711,19 +3772,20 @@ export async function handler(message: WAMessage): Promise<any> {
         });
       } else if (pre('steal') || pre('maling') || pre('copet')) {
         if (!isQuotedSticker) return reply('Maaf, perintah tidak valid');
-        let media = JSON.parse(JSON.stringify(message).replace('quotedM', 'm'))
-          .message.extendedTextMessage.contextInfo;
+        const media = JSON.parse(
+          JSON.stringify(message).replace('quotedM', 'm')
+        ).message.extendedTextMessage.contextInfo;
         client.downloadMediaMessage(media).then(data => {
           modifExif(data, msgId, res => {
             client.sendMessage(from, res, sticker, {quoted: replyMode});
           });
         });
       } else if (pre('gtts')) {
-        let gttsText = isQuotedText ? getQuotedText() : getQuery('gtts');
+        const gttsText = isQuotedText ? getQuotedText() : getQuery('gtts');
         if (!gttsText) return;
         if (gttsText.length >= 250) return sendText('Teks Kepanjangan :(');
-        var gtts = new gTTs(gttsText, 'id');
-        gtts.save(`../temp/${msgId}.m4a`, function () {
+        const gtts = new gTTs(gttsText, 'id');
+        gtts.save(`../temp/${msgId}.m4a`, () => {
           client.sendMessage(
             from,
             fs.readFileSync(`../temp/${msgId}.m4a`),
@@ -3745,7 +3807,7 @@ export async function handler(message: WAMessage): Promise<any> {
           quoted: replyMode,
         });
       } else if (pre('brainly')) {
-        let pertanyaan = getQuery('brainly');
+        const pertanyaan = getQuery('brainly');
         if (!pertanyaan) return;
         brainly(pertanyaan)
           .then(hasil => {
@@ -3755,7 +3817,7 @@ export async function handler(message: WAMessage): Promise<any> {
             reply(err);
           });
       } else if (pre('tahta')) {
-        let text = args[1];
+        const text = args[1];
         if (!text || args.length > 2)
           return reply('Maaf, perintah tidak valid');
         if (text.length > 8)
@@ -3780,7 +3842,7 @@ export async function handler(message: WAMessage): Promise<any> {
             })
           );
       } else if (pre('a-harta')) {
-        let text = args[1].toUpperCase();
+        const text = args[1].toUpperCase();
         if (!text || args.length > 2)
           return reply('Maaf, perintah tidak valid');
         if (text.length > 8)
@@ -3792,7 +3854,7 @@ export async function handler(message: WAMessage): Promise<any> {
           })
           .catch(err => console.log(err));
       } else if (pre('harta')) {
-        let text = args[1];
+        const text = args[1];
         if (!text || args.length > 2)
           return reply('Maaf, perintah tidak valid');
         if (text.length > 8)
@@ -3813,11 +3875,11 @@ export async function handler(message: WAMessage): Promise<any> {
           );
       } else if (pre('timestamp')) {
         if (permission(['self'])) return;
-        let text = getQuery('timestamp');
+        const text = getQuery('timestamp');
         if (!text.includes('|')) return reply('Maaf, perintah tidak valid');
-        let time = text.split('|')[0].trim();
-        let stmp = text.split('|')[1].trim();
-        let thetxt = text.split('|')[2].trim();
+        const time = text.split('|')[0].trim();
+        const stmp = text.split('|')[1].trim();
+        const thetxt = text.split('|')[2].trim();
         if (!time || !stmp || !thetxt)
           return reply('Maaf, peritah tidak valid');
         client.sendMessage(from, thetxt, MessageType.text, {
@@ -3827,17 +3889,17 @@ export async function handler(message: WAMessage): Promise<any> {
       } else if (pre('fitnah')) {
         if (permission(['self'])) return;
         if (!cmd.includes('|')) return reply('Maaf, perintah tidak valid');
-        let mentioned = message.message!.extendedTextMessage!.contextInfo!
+        const mentioned = message.message!.extendedTextMessage!.contextInfo!
           .mentionedJid;
-        let teks = cmd.split('|')[1].trim();
-        let teks2 = cmd.split('|')[2].trim();
+        const teks = cmd.split('|')[1].trim();
+        const teks2 = cmd.split('|')[2].trim();
         if (!mentioned || !teks || !teks2)
           return reply('Maaf, perintah tidak valid');
         client.deleteMessage(from, {id: msgId, remoteJid: from, fromMe: true});
         client.fakeReply1(from, teks2, <any>mentioned[0], teks, from);
       } else {
         if (autoSuggest) {
-          let hasil = didYouMean(args[0].replace(prefix, ''), suggestions, {
+          const hasil = didYouMean(args[0].replace(prefix, ''), suggestions, {
             caseSensitive: true,
           });
           if (hasil)

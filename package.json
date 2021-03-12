@@ -34,7 +34,7 @@
   },
   "dependencies": {
     "@adiwajshing/baileys": "github:adiwajshing/baileys",
-    "@tensorflow/tfjs-node": "^3.2.0",
+    "@tensorflow/tfjs-node": "^3.3.0",
     "@types/fluent-ffmpeg": "^2.1.16",
     "@types/node": "^14.14.33",
     "@types/node-fetch": "^2.5.8",
@@ -62,7 +62,7 @@
     "gtts": "^0.2.1",
     "imdb-scraper": "^2.0.2",
     "indo-news-scraper": "^1.4.0",
-    "itech-wrapper": "^1.0.2",
+    "itech-wrapper": "^1.0.5",
     "jimp": "^0.16.1",
     "jsdom": "^16.5.0",
     "match-index": "^1.0.3",

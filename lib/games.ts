@@ -1,3 +1,4 @@
+/* eslint-disable no-self-assign */
 const fs: any = require('fs-extra');
 import client from '../index';
 import {createCanvas, registerFont} from 'canvas';
@@ -365,7 +366,7 @@ export default class Game {
           if (choice === 'end') {
             winner = userTurn ? opponent : from;
             break;
-          } else if (choice == 'timeout') {
+          } else if (choice === 'timeout') {
             winner = 'time';
             break;
           }

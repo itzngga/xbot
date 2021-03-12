@@ -1,28 +1,21 @@
-import * as type from '../types';
-const fs: any = require('fs-extra');
-const count: type.countType = fs.readJSONSync('../json/count.json');
-const setting = type.setting;
-const cron: any = require('node-cron');
-
-cron.schedule('* * * * * *', () => {
-  saveCount();
-});
+import {setting, count} from '../types';
+import { db } from '../types/db';
 
 export const addCount = (cmd: string): boolean => {
   if (count.hasOwnProperty(cmd)) {
     count[cmd]!.count++;
+    db.push('/count', count)
     return true;
   } else {
     count[cmd] = {
       count: 1,
       type: 'member',
     };
+    db.push('/count', count)
     return true;
   }
 };
-const saveCount = (): void => {
-  return fs.writeJSONSync('../json/count.json', count, {spaces: 2});
-};
+
 export const countAll = (): any => {
   let counts = 0;
   for (const [key, val] of Object.entries(count)) {
@@ -48,6 +41,7 @@ export const countAdd = (cmd: string): string => {
       count: 1,
       type: 'member',
     };
+    db.push('/count', count)
     return 'Sukses add *' + cmd + '*';
   } else {
     return 'No count named *' + cmd + '*';
@@ -57,6 +51,7 @@ export const countAdd = (cmd: string): string => {
 export const countRemove = (cmd: string): string => {
   if (count.hasOwnProperty(cmd)) {
     delete count[cmd];
+    db.push('/count', count)
     return 'Sukses remove *' + cmd + '*';
   } else {
     return 'No count named *' + cmd + '*';
@@ -66,6 +61,7 @@ export const countRemove = (cmd: string): string => {
 export const setCountAsAdmin = (cmd: string): string => {
   if (count.hasOwnProperty(cmd)) {
     count[cmd]!.type = 'admin';
+    db.push('/count', count)
     return 'Sukses set *' + cmd + '* sbg admin cmd';
   } else {
     return 'No count named *' + cmd + '*';
@@ -75,6 +71,7 @@ export const setCountAsAdmin = (cmd: string): string => {
 export const setCountAsMember = (cmd: string): string => {
   if (count.hasOwnProperty(cmd)) {
     count[cmd]!.type = 'member';
+    db.push('/count', count)
     return 'Sukses remove *' + cmd + '* sbg admin cmd';
   } else {
     return 'No count named *' + cmd + '*';

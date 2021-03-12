@@ -1,3 +1,5 @@
+/* eslint-disable prefer-spread */
+/* eslint-disable prefer-rest-params */
 import {group} from '../types';
 
 const fs: any = require('fs-extra');
@@ -5,8 +7,8 @@ const fs: any = require('fs-extra');
 if (typeof Array.prototype.splice === 'undefined') {
   Array.prototype.splice = function (index: number, howmanys: number) {
     const howmany = howmanys || this.length;
-    const elems = Array.prototype.slice.call(arguments, 2)
-    let newArr = this.slice(0, index)
+    const elems = Array.prototype.slice.call(arguments, 2);
+    let newArr = this.slice(0, index);
     const last = this.slice(index + howmany);
     newArr = newArr.concat.apply(newArr, elems);
     newArr = newArr.concat.apply(newArr, last);
@@ -38,7 +40,7 @@ function isGroupAdded(gid: string) {
 export function isCmd(gid: string, cmd: string) {
   return new Promise(resolve => {
     isGroupAdded(gid).then((res: any) => {
-      const i = res.command.find((x: any) => x.cmd == cmd);
+      const i = res.command.find((x: any) => x.cmd === cmd);
       if (i) {
         return resolve(i);
       }
@@ -48,7 +50,7 @@ export function isCmd(gid: string, cmd: string) {
 export function addCmd(gid: string, cmd: string, result: string) {
   return new Promise((resolve, reject) => {
     isGroupAdded(gid).then((res: any) => {
-      const i = res.command.find((x: any) => x.cmd == cmd);
+      const i = res.command.find((x: any) => x.cmd === cmd);
       if (i) {
         return reject('[ERROR] custom command are exist');
       } else {
@@ -72,7 +74,7 @@ export function addMedia(
   return new Promise((resolve, reject) => {
     try {
       isGroupAdded(gid).then((res: any) => {
-        const i = res.command.find((x: any) => x.cmd == cmd);
+        const i = res.command.find((x: any) => x.cmd === cmd);
         if (i) {
           return reject('[ERROR] custom command are exist');
         } else {
@@ -98,8 +100,8 @@ export function addMedia(
 export function rmvCmd(gid: string, cmd: string) {
   return new Promise((resolve, reject) => {
     isGroupAdded(gid).then((res: any) => {
-      const i = res.command.findIndex((x: any) => x.cmd == cmd);
-      if (i == -1) {
+      const i = res.command.findIndex((x: any) => x.cmd === cmd);
+      if (i === -1) {
         return reject(`[ERROR] custom command ${cmd} tidak ada!`);
       } else {
         if (!res.command[i].result) {

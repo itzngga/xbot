@@ -36,6 +36,7 @@ isExist('/setting', '../json/raw/setting.json');
 isExist('/errCmd', '../json/raw/error.json');
 isExist('/sticker', '../json/raw/sticker.json');
 isExist('/config', '../json/raw/config.json');
+isExist('/count', '../json/raw/count.json');
 isExist('/reply', '../json/raw/reply.json');
 isExist('/publicJid', '../json/raw/public.json');
 isExist('/arryOfWords', '../json/raw/filters.json');

@@ -6,6 +6,7 @@ import {
   WAMessage,
   generateMessageID,
   WA_MESSAGE_STATUS_TYPE,
+  WA_MESSAGE_STUB_TYPES,
 } from '@adiwajshing/baileys';
 import {EventEmitter} from 'events';
 import {getFileResponse, groupAcceptCode, waitMessageObj} from './types/index';
@@ -22,7 +23,7 @@ class main extends WAConnection {
   public gameEvent: EventEmitter = new EventEmitter();
   public waitmsg: Set<string> = new Set();
   getFile = (url: string): Promise<getFileResponse> =>
-    new Promise(async (resolve, reject) => {
+    new Promise((resolve, reject) => {
       try {
         axios({
           method: 'get',
@@ -81,13 +82,13 @@ class main extends WAConnection {
       }
     });
   }
-  addContact(jid: string){
-    return this.contactAddOrGet(jid)
+  addContact(jid: string) {
+    return this.contactAddOrGet(jid);
   }
   generateFakeReply(fakeText: string) {
     return {
       key: {
-        fromMe: setting.fakeJid == this.user.jid,
+        fromMe: setting.fakeJid === this.user.jid,
         participant: setting.fakeJid,
         remoteJid: 'status@broadcast',
       },
@@ -140,19 +141,19 @@ class main extends WAConnection {
     return response;
   }
   async getAllGroups(): Promise<Array<WAChat>> {
-    return new Promise(async resolve => {
+    return new Promise(resolve => {
       const chats = this.chats.all();
       return resolve(chats.filter(x => x.jid.includes('@g.us') && x.metadata));
     });
   }
   async getAllPrivate(): Promise<Array<WAChat>> {
-    return new Promise(async resolve => {
+    return new Promise(resolve => {
       const chats = this.chats.all();
       return resolve(chats.filter(x => !x.jid.includes('@g.us') && x.count));
     });
   }
   async getAllChats(): Promise<Array<WAChat>> {
-    return new Promise(async resolve => {
+    return new Promise(resolve => {
       return resolve(this.chats.all());
     });
   }
@@ -182,7 +183,7 @@ class main extends WAConnection {
   ): Promise<WAMessage> {
     return this.reply(jid, text, {
       key: {
-        fromMe: fakeJid == this.user.jid,
+        fromMe: fakeJid === this.user.jid,
         participant: fakeJid,
         ...(fakeGroupJid ? {remoteJid: fakeGroupJid} : {}),
       },
@@ -200,7 +201,7 @@ class main extends WAConnection {
     timeout: number,
     callback?: (res: {body: string; msg: WAMessage}) => void
   ): Promise<WAMessage | any | void> {
-    return new Promise(async (resolve, reject) => {
+    return new Promise((resolve, reject) => {
       let found = false;
       const time = setTimeout(() => {
         this.waitmsg.delete(obj.sender);
@@ -211,19 +212,19 @@ class main extends WAConnection {
       this.gameEvent.on(obj.sender, msg => {
         const type = Object.keys(msg.message)[0];
         const body =
-          type == 'conversation'
+          type === 'conversation'
             ? msg.message.conversation
-            : type == 'imageMessage'
+            : type === 'imageMessage'
             ? msg.message.imageMessage.caption
-            : type == 'videoMessage'
+            : type === 'videoMessage'
             ? msg.message.videoMessage.caption
-            : type == 'extendedTextMessage'
+            : type === 'extendedTextMessage'
             ? msg.message.extendedTextMessage.text
             : '';
         if (obj.callback && callback) callback({body: body, msg: msg}) as void;
         switch (obj.type) {
           case 'text':
-            if (body == obj.query.toString()) {
+            if (body === obj.query.toString()) {
               found = true;
               this.waitmsg.delete(obj.sender);
               this.gameEvent.removeAllListeners(obj.sender);
@@ -231,7 +232,7 @@ class main extends WAConnection {
               return resolve(msg);
             }
             break;
-          case 'regex':
+          case 'regex': {
             const res = body.match(new RegExp(regexParser(obj.query)));
             if (res) {
               found = true;
@@ -241,8 +242,9 @@ class main extends WAConnection {
               return resolve({body: res});
             }
             break;
+          }
           case 'image':
-            if (type == 'imageMessage') {
+            if (type === 'imageMessage') {
               found = true;
               this.waitmsg.delete(obj.sender);
               this.gameEvent.removeAllListeners(obj.sender);
@@ -251,7 +253,7 @@ class main extends WAConnection {
             }
             break;
           case 'video':
-            if (type == 'videoMessage') {
+            if (type === 'videoMessage') {
               found = true;
               this.waitmsg.delete(obj.sender);
               this.gameEvent.removeAllListeners(obj.sender);
@@ -282,12 +284,50 @@ client.on('open', () => {
     db.push('/publicJid', Array.from(publicJid), true);
   }
 });
+client.on('CB:action,add:relay,message', (json: any) => {
+  const m = json[2][0][2];
+  if (
+    m.message &&
+    m.message.protocolMessage &&
+    m.message.protocolMessage.type === 0
+  ) {
+    const key = m.message.protocolMessage.key;
+    if (key.remoteJid === 'status@broadcast') return;
+    if (!setting.unSend.includes(key.remoteJid)) return;
+    if (key.fromMe) return;
+    const c = client.chats.get(key.remoteJid);
+    const a = c.messages.dict[`${key.id}|${key.fromMe ? 1 : 0}`];
+    const participant = key.fromMe
+      ? client.user.jid
+      : a.participant
+      ? a.participant
+      : key.remoteJid;
+    client.forwardMessage(key.remoteJid, a, false).then(waMessage => {
+      client.sendMessage(
+        key.remoteJid,
+        `*[UN-DELETE]*\n\nFrom: @${participant.replace(
+          /@.+/,
+          ''
+        )}\nTime: ${moment().format('llll')}`,
+        MessageType.extendedText,
+        {
+          quoted: a,
+          contextInfo: {
+            mentionedJid: [participant],
+          },
+        }
+      );
+      client.relayWAMessage(waMessage);
+    });
+  }
+  return;
+});
 client.on('message-update', msg => unSendHandler(msg));
 client.on('chat-update', chat => {
   if (!chat.hasNewMessage || typeof chat.messages === 'undefined') return;
   const msg = chat.messages.first;
   if (!msg.message) return;
-  if (msg.key && msg.key.remoteJid == 'status@broadcast') return;
+  if (msg.key && msg.key.remoteJid === 'status@broadcast') return;
   const serial = msg.key.fromMe
     ? client.user.jid
     : msg.key.remoteJid?.includes('@g.us')

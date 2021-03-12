@@ -48,7 +48,7 @@ export default function (
 
 function quality(qts: number): string[] {
   switch (qts) {
-    case 1:
+    case 1: {
       //very high
       const arr = [
         '-vcodec',
@@ -68,7 +68,8 @@ function quality(qts: number): string[] {
         '512:512',
       ];
       return arr;
-    case 2:
+    }
+    case 2: {
       //high
       const arr1 = [
         '-vcodec',
@@ -88,7 +89,9 @@ function quality(qts: number): string[] {
         '200:200',
       ];
       return arr1;
-    case 3:
+    }
+
+    case 3: {
       //medium
       const arr2 = [
         '-vcodec',
@@ -108,7 +111,8 @@ function quality(qts: number): string[] {
         '150:150',
       ];
       return arr2;
-    case 4:
+    }
+    case 4: {
       //low
       const arr3 = [
         '-vcodec',
@@ -128,7 +132,8 @@ function quality(qts: number): string[] {
         '150:150',
       ];
       return arr3;
-    case 5:
+    }
+    case 5: {
       //very low
       const arr4 = [
         '-vcodec',
@@ -148,7 +153,9 @@ function quality(qts: number): string[] {
         '100:100',
       ];
       return arr4;
-    default:
+    }
+
+    default: {
       const arr5 = [
         '-vcodec',
         'libwebp',
@@ -167,5 +174,6 @@ function quality(qts: number): string[] {
         '150:150',
       ];
       return arr5;
+    }
   }
 }

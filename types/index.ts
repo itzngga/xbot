@@ -1,13 +1,14 @@
 import {db} from './db';
 import {Moment} from 'moment';
-const fs: any = require('fs-extra');
 
+export const dirname = require.main?.path;
 export const setting = db.getObject<settingType>('/setting');
 export const errCmd = db.getObject<string[]>('/errCmd');
 export const sticker = db.getObject<stickerType>('/sticker');
 export const config = db.getObject<configType>('/config');
 export const reply = db.getObject<reply>('/reply');
 export const cloud = db.getObject<cloud>('/cloud');
+export const count = db.getObject<countType>('/count');
 export const textpro = db.getObject<string[]>('/textpro');
 export const publicJid = new Set(db.getObject<string[]>('/publicJid'));
 export const arryOfWords = db.getObject<string[]>('/arryOfWords');

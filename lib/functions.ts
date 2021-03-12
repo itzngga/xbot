@@ -61,9 +61,7 @@ export const quoted = (maker: string, quote: string): Promise<any> =>
     }
   });
 export const ytmp3 = async (url: string): Promise<any> => {
-  const response = await fetch(
-    'http://scrap.terhambar.com/yt?link=' + url
-  );
+  const response = await fetch('http://scrap.terhambar.com/yt?link=' + url);
   if (!response.ok)
     throw new Error(`unexpected response ${response.statusText}`);
   const json = await response.json();
