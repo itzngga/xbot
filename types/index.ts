@@ -1,5 +1,11 @@
+/* eslint-disable @typescript-eslint/no-namespace */
 import {db} from './db';
 import {Moment} from 'moment';
+import {
+	WAGroupMetadata,
+	WAGroupParticipant,
+	WAMessage,
+} from '@adiwajshing/baileys';
 
 export const dirname = require.main?.path;
 export const setting = db.getObject<settingType>('/setting');
@@ -12,120 +18,181 @@ export const count = db.getObject<countType>('/count');
 export const textpro = db.getObject<string[]>('/textpro');
 export const publicJid = new Set(db.getObject<string[]>('/publicJid'));
 export const arryOfWords = db.getObject<string[]>('/arryOfWords');
-export const fakeReplyBase64 = db.getObject('/fakeReplyBase64');
+export const fakeReplyBase64: string = db.getObject('/fakeReplyBase64');
 
 export const updateObj = (name: string) => {
-  eval(name);
+	eval(name);
 };
 export interface getFileResponse {
-  buffer: Buffer;
-  mimetype: MimeType;
+	buffer: Buffer;
+	mimetype: MimeType;
 }
 
 export type groupAcceptCode = {
-  code: number;
-  gid: string;
+	code: number;
+	gid: string;
 };
 
 export type settingType = {
-  sAdmin: string;
-  costumerId: string;
-  restartState: boolean;
-  restartId: string;
-  prefix: string;
-  unSend: string[];
-  autoRead: boolean;
-  autoReply: boolean;
-  pm2Id: string;
-  fakeReply: boolean;
-  fakeText: string;
-  fakeJid: string;
-  antiVirtex: boolean;
-  universalPublic: boolean;
+	sAdmin: string;
+	costumerId: string;
+	restartState: boolean;
+	restartId: string;
+	prefix: string;
+	unSend: string[];
+	autoRead: boolean;
+	autoReply: boolean;
+	pm2Id: string;
+	fakeReply: boolean;
+	fakeText: string;
+	fakeJid: string;
+	antiVirtex: boolean;
+	universalPublic: boolean;
 };
 
 export type waitMessageObj = {
-  sender: string;
-  query: string;
-  type: string;
-  callback?: boolean;
+	sender: string;
+	query: string;
+	type: string;
+	callback?: boolean;
 };
 
 export type cloud = {
-  [key: string]: {
-    path: string;
-    format: string;
-    timestamp: string;
-  };
+	[key: string]: {
+		path: string;
+		format: string;
+		timestamp: string;
+	};
 };
 export type countType = {
-  [key: string]: {
-    count: number;
-    type: string;
-  };
+	[key: string]: {
+		count: number;
+		type: string;
+	};
 };
 export interface configType {
-  apikeys: {
-    vthear: string;
-    cekresi?: string[];
-    keepsaveit?: string[];
-    bitly: string;
-    genius: string;
-    tech: string;
-  };
-  vcard: {
-    cs: {
-      displayName: string;
-      vcard: string;
-    };
-    owner: {
-      displayName: string;
-      vcard: string;
-    };
-  };
-  secret: string;
-  ytCookie: string;
-  scdl: string;
-  ytIdentity: string;
-  igCookie: string;
+	apikeys: {
+		vthear: string;
+		cekresi?: string[];
+		keepsaveit?: string[];
+		bitly: string;
+		genius: string;
+		tech: string;
+	};
+	vcard: {
+		cs: {
+			displayName: string;
+			vcard: string;
+		};
+		owner: {
+			displayName: string;
+			vcard: string;
+		};
+	};
+	secret: string;
+	ytCookie: string;
+	scdl: string;
+	ytIdentity: string;
+	igCookie: string;
 }
 
 export type reply = {
-  [key: string]: {
-    answer: string;
-  };
+	[key: string]: {
+		answer: string;
+	};
 };
 
 export type group = {
-  gid: string;
-  command: string[];
-  settings: Object;
+	gid: string;
+	command: string[];
+	settings: Object;
 };
 
 export type stickerType = {
-  [key: string]: {
-    date_added: Moment;
-    last_update: Moment;
-    maker: string;
-    path: string;
-  };
+	[key: string]: {
+		date_added: Moment;
+		last_update: Moment;
+		maker: string;
+		path: string;
+	};
 };
 
 export type textproType = {
-  [key: string]: {
-    type: number;
-    link: string;
-  };
+	[key: string]: {
+		type: number;
+		link: string;
+	};
 };
 
 export interface igstalk {
-  username: string;
-  fullname: string;
-  biography: string;
-  private: boolean;
-  imageurl: string;
-  followers: number;
-  followed: number;
-  post: number;
-  highlight: number;
+	username: string;
+	fullname: string;
+	biography: string;
+	private: boolean;
+	imageurl: string;
+	followers: number;
+	followed: number;
+	post: number;
+	highlight: number;
+}
+interface Group extends WAGroupMetadata {
+	descTime: number;
+}
+
+export interface handlerType {
+	message: WAMessage;
+	fromMe: boolean;
+	chatId: string;
+	msgId: string;
+	from: string;
+	botNumber: string;
+	isGroupMsg: boolean;
+	serial: string;
+	isSadmin: boolean;
+	type: string;
+	isQuoted: boolean;
+	body: string;
+	t: number;
+	time: string;
+	cmd: string;
+	args: any[];
+	replyMode: WAMessage;
+	groupMetadata: Group;
+	groupName: string;
+	groupId: string;
+	groupDesc: string | undefined;
+	groupMembers: WAGroupParticipant[];
+	groupAdmins: string[];
+	isBotGroupAdmins: boolean;
+	isGroupAdmins: boolean;
+	isGroupAdminOnly: string | undefined;
+	isMedia: boolean;
+	isImage: boolean;
+	isVideo: boolean;
+	isAudio: boolean;
+	isSticker: boolean;
+	isDocument: boolean;
+	isQuotedText: boolean;
+	isQuotedImage: boolean;
+	isQuotedVideo: boolean;
+	isQuotedAudio: boolean;
+	isQuotedSticker: boolean;
+	isQuotedDocument: boolean;
+	content: () => string | boolean;
+	quotedMsgObj: () => any;
+	getQuotedText: () => any;
+	getQuotedImage: () => any;
+	getQuotedVideo: () => any;
+	getQuotedAudio: () => any;
+	getQoutedSticker: () => any;
+	getQuotedDocument: () => any;
+	fileSize: (quoted: boolean) => number;
+	pushname: (target?: string) => string;
+	mentionedJidList: () => string[];
+}
+
+declare module '@adiwajshing/baileys' {
+	export interface ExtendedTextMessage {
+		donwload: (link: string) => {};
+	}
 }

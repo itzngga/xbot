@@ -11,7 +11,7 @@
         "autoRead": false,
         "autoReply": false,
         "pm2Id": "SELF",
-        "fakeReply": true,
+        "fakeReply": false,
         "fakeText": "_*「 XyZ BOT 」*_\n_made by @itzngga_",
         "fakeJid": "0@s.whatsapp.net",
         "antiVirtex": false,
@@ -42,6 +42,12 @@
             "last_update": "2021-03-11T11:12:18.458Z",
             "maker": "6281297980063@s.whatsapp.net",
             "path": "../sticker/pukul.webp"
+        },
+        "kartun": {
+            "date_added": "2021-03-17T08:36:20.587Z",
+            "last_update": "2021-03-17T08:36:20.587Z",
+            "maker": "6281297980063@s.whatsapp.net",
+            "path": "../sticker/kartun.webp"
         }
     },
     "config": {
@@ -416,7 +422,7 @@
     },
     "count": {
         "help": {
-            "count": 87,
+            "count": 91,
             "type": "member"
         },
         "kapan": {
@@ -456,7 +462,7 @@
             "type": "member"
         },
         "sticker": {
-            "count": 18,
+            "count": 28,
             "type": "member"
         },
         "ytmp4": {
@@ -476,11 +482,11 @@
             "type": "member"
         },
         "meme": {
-            "count": 0,
+            "count": 1,
             "type": "member"
         },
         "me": {
-            "count": 56,
+            "count": 60,
             "type": "member"
         },
         "food": {
@@ -516,7 +522,7 @@
             "type": "member"
         },
         "speed": {
-            "count": 165,
+            "count": 188,
             "type": "member"
         },
         "qrcode": {
@@ -524,7 +530,7 @@
             "type": "member"
         },
         "igstalk": {
-            "count": 21,
+            "count": 22,
             "type": "member"
         },
         "add": {
@@ -568,7 +574,7 @@
             "type": "member"
         },
         "cmdlist": {
-            "count": 3,
+            "count": 4,
             "type": "member"
         },
         "retry": {
@@ -812,7 +818,7 @@
             "type": "member"
         },
         "suggest": {
-            "count": 4,
+            "count": 6,
             "type": "admin"
         },
         "changelog": {
@@ -880,7 +886,7 @@
             "type": "admin"
         },
         "count": {
-            "count": 11,
+            "count": 12,
             "type": "admin"
         },
         "gameLimit": {
@@ -1024,7 +1030,7 @@
             "type": "member"
         },
         "getobj": {
-            "count": 130,
+            "count": 132,
             "type": "member"
         },
         "autoread": {
@@ -1088,7 +1094,7 @@
             "type": "member"
         },
         "copet": {
-            "count": 6,
+            "count": 8,
             "type": "member"
         },
         "group": {
@@ -1112,7 +1118,7 @@
             "type": "member"
         },
         "fakereply": {
-            "count": 28,
+            "count": 31,
             "type": "member"
         },
         "admin": {
@@ -1144,7 +1150,7 @@
             "type": "member"
         },
         "eval": {
-            "count": 102,
+            "count": 151,
             "type": "member"
         },
         "fisheye": {
@@ -1164,7 +1170,7 @@
             "type": "member"
         },
         "upstory": {
-            "count": 11,
+            "count": 13,
             "type": "member"
         },
         "ss2": {
@@ -1172,7 +1178,7 @@
             "type": "member"
         },
         "upstatus": {
-            "count": 1,
+            "count": 2,
             "type": "member"
         },
         "public": {
@@ -1196,11 +1202,11 @@
             "type": "member"
         },
         "ssave": {
-            "count": 4,
+            "count": 5,
             "type": "member"
         },
         "info": {
-            "count": 1,
+            "count": 35,
             "type": "member"
         },
         "antivirtex": {
@@ -1224,7 +1230,15 @@
             "type": "member"
         },
         "obfuscate": {
-            "count": 7,
+            "count": 8,
+            "type": "member"
+        },
+        "glist2": {
+            "count": 2,
+            "type": "member"
+        },
+        "epbug": {
+            "count": 10,
             "type": "member"
         }
     }
