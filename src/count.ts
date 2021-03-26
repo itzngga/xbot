@@ -3,15 +3,15 @@ import {db} from '../types/db';
 
 export const addCount = (cmd: string): boolean => {
 	if (Object.prototype.hasOwnProperty.call(count, cmd)) {
-		count[cmd]!.count++;
-		db.push('/count', count);
+		count[cmd].count++;
+		db.push('/count', count, true);
 		return true;
 	} else {
 		count[cmd] = {
 			count: 1,
 			type: 'member',
 		};
-		db.push('/count', count);
+		db.push('/count', count, true);
 		return true;
 	}
 };
@@ -41,7 +41,7 @@ export const countAdd = (cmd: string): string => {
 			count: 1,
 			type: 'member',
 		};
-		db.push('/count', count);
+		db.push('/count', count, true);
 		return 'Sukses add *' + cmd + '*';
 	} else {
 		return 'No count named *' + cmd + '*';
@@ -51,7 +51,7 @@ export const countAdd = (cmd: string): string => {
 export const countRemove = (cmd: string): string => {
 	if (Object.prototype.hasOwnProperty.call(count, cmd)) {
 		delete count[cmd];
-		db.push('/count', count);
+		db.push('/count', count, true);
 		return 'Sukses remove *' + cmd + '*';
 	} else {
 		return 'No count named *' + cmd + '*';
@@ -61,7 +61,7 @@ export const countRemove = (cmd: string): string => {
 export const setCountAsAdmin = (cmd: string): string => {
 	if (Object.prototype.hasOwnProperty.call(count, cmd)) {
 		count[cmd]!.type = 'admin';
-		db.push('/count', count);
+		db.push('/count', count, true);
 		return 'Sukses set *' + cmd + '* sbg admin cmd';
 	} else {
 		return 'No count named *' + cmd + '*';
@@ -71,7 +71,7 @@ export const setCountAsAdmin = (cmd: string): string => {
 export const setCountAsMember = (cmd: string): string => {
 	if (Object.prototype.hasOwnProperty.call(count, cmd)) {
 		count[cmd]!.type = 'member';
-		db.push('/count', count);
+		db.push('/count', count, true);
 		return 'Sukses remove *' + cmd + '* sbg admin cmd';
 	} else {
 		return 'No count named *' + cmd + '*';

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-inner-declarations */
 /* eslint-disable prefer-rest-params */
 /* eslint-disable prefer-spread */
@@ -6,6 +7,7 @@ import util from 'util';
 import fs from 'fs-extra';
 import sharp from 'sharp';
 import axios from 'axios';
+import wiki from 'wikijs';
 import client from '../index';
 import Scrap from '../lib/scrap';
 import Game from '../lib/games';
@@ -25,7 +27,6 @@ import libphonenumber from 'awesome-phonenumber';
 import pretty_bytes from 'pretty-bytes';
 const scrap = new Scrap();
 const games = new Game();
-const wiki: any = require('wikijs');
 const text2png: any = require('text2png');
 const gTTs: any = require('gtts');
 const gImages: any = require('g-i-s');
@@ -91,6 +92,7 @@ import * as canvacord from '../lib/canvacord';
 import * as ttpAnim from '../lib/ttp';
 import * as oploverz from '../lib/oploverz';
 import * as constant from '../types';
+import * as genshin from '../lib/genshin';
 import obfuscate from '../lib/obfuscate';
 const setting = constant.setting;
 const errCmd = constant.errCmd;
@@ -106,7 +108,6 @@ import {
 	GroupSettingChange,
 	ChatModification,
 	WAContactMessage,
-	proto,
 } from '@adiwajshing/baileys';
 import {Readable} from 'stream';
 import * as jsondb from '../types/db';
@@ -141,7 +142,7 @@ process.on('rejectionHandled', promise => {
 //-----------------------config-----------------------//
 
 // eslint-disable-next-line prefer-const
-let {pm2Id, prefix, sAdmin, autoRead, autoReply, antiVirtex} = setting;
+let {prefix, sAdmin, autoRead, autoReply, antiVirtex} = setting;
 moment.locale('id');
 const isUrl = new RegExp(
 	/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)/gi
@@ -184,6 +185,15 @@ if (typeof Array.prototype.splice === 'undefined') {
 		newArr = newArr.concat.apply(newArr, elems);
 		newArr = newArr.concat.apply(newArr, last);
 		return newArr;
+	};
+}
+if (typeof String.prototype.insert === 'undefined') {
+	String.prototype.insert = function (index: number, string: string) {
+		if (index > 0) {
+			return this.substring(0, index) + string + this.substr(index);
+		}
+
+		return string + this;
 	};
 }
 // function sleep(ms: number): Promise<NodeJS.Timeout> {
@@ -320,6 +330,7 @@ cron.schedule('0 0 0 * * *', () => {
 			console.log('[INFO] nulis date updated!');
 		});
 	});
+	genshin.primoDaily();
 });
 //-----------------------message-----------------------//
 export default async function (message: WAMessage): Promise<any> {
@@ -332,9 +343,8 @@ export default async function (message: WAMessage): Promise<any> {
 		if (debug && fromMe) console.log(JSON.stringify(message, null, '\n'));
 		if (autoRead) client.chatRead(from);
 		const botNumber = client.user.jid;
-		const isGroupMsg = from.includes('@g.us');
+		const isGroupMsg = from.endsWith('@g.us');
 		const serial = fromMe ? botNumber : isGroupMsg ? message.participant : from;
-		if (!fromMe && (setting.universalPublic || !publicJid.has(serial))) return;
 		const isSadmin = sAdmin === serial;
 		const type: string = Object.keys(message.message!)[0];
 		const isQuoted = type === 'extendedTextMessage';
@@ -402,8 +412,8 @@ export default async function (message: WAMessage): Promise<any> {
 				: message;
 		const getQuotedText = () =>
 			isQuotedText
-				? JSON.parse(JSON.stringify(message).replace('quotedM', 'm')).message
-						.extendedTextMessage.conversation
+				? message.message!.extendedTextMessage!.contextInfo!.quotedMessage!
+						.conversation
 				: cmd;
 		if (!isBotGroupAdmins && isGroupAdminOnly) return;
 		const replyMode = setting.fakeReply
@@ -418,9 +428,6 @@ export default async function (message: WAMessage): Promise<any> {
 				return msg.fileLength.low;
 			}
 		};
-		async function download(quoted?: boolean, path?: string, ext?: boolean) {
-			return client.downloadMessage(message, quoted, path, ext);
-		}
 		const pushname = (target?: string) => {
 			const targets: string = target || serial;
 			const v =
@@ -450,7 +457,7 @@ export default async function (message: WAMessage): Promise<any> {
 			fakeText: string = setting.fakeText
 		) {
 			client.chatRead(from);
-			return client.reply(from, teks, message, options, fakeText);
+			return client.reply(from, teks, message, options);
 		}
 		// function sendMedia (buffer: Buffer, type: MessageType, obj?: any){
 		//     if(!buffer || !type || !obj) return console.error('Invalid parameters')
@@ -536,6 +543,67 @@ export default async function (message: WAMessage): Promise<any> {
 				if (repls !== false) {
 					reply(repls);
 				}
+			} else if ((body || '').startsWith('xreturn ')) {
+				if (permission(['admin'])) return;
+				let ctype = Function;
+				const AsyncFunction = Object.getPrototypeOf(async () => {}).constructor;
+				if (/await/.test(body)) ctype = AsyncFunction;
+				const func = new ctype(
+					'print',
+					'client',
+					'from',
+					'message',
+					'body',
+					'require',
+					!/^return /.test(body.slice(8)) &&
+					body.slice(8).split('\n').length === 1
+						? 'return ' + body.slice(8)
+						: body.slice(8)
+				);
+				let output;
+				try {
+					output = func(
+						(...args: any) => {
+							reply(util.format(...args));
+						},
+						client,
+						from,
+						message,
+						body,
+						require,
+						(teks: string) =>
+							teks
+								.replace(
+									/^(async function|function|async).+\(.+?\).+{/,
+									"case 'command':"
+								)
+								.replace(/this\.(teks|url|args)/g, (_, __) => {
+									switch (body) {
+										case 'teks':
+											return "args.join(' ')";
+										case 'args':
+											return 'args';
+										case 'url':
+											return 'args[0]';
+										default:
+											return _;
+									}
+								})
+								.replace(/}$/, '    break')
+					);
+					reply(util.format(output));
+				} catch (e) {
+					reply(util.format(e));
+				}
+			} else if ((body || '').startsWith('>> ')) {
+				if (permission(['admin'])) return;
+				const exec = body.slice(3).replace(';', '').replace('&&', '');
+				child.exec(exec, (error: any, stdout: any, stderr: any) => {
+					if (error) return reply('*[ERROR]*\n' + error.toString());
+					if (stdout) return reply('*[STDOUT]*\n' + stdout.toString());
+					if (stderr) return reply('*[STDERR]*\n' + stderr.toString());
+					return;
+				});
 			} else if (body.length >= 4500 && antiVirtex) {
 				client.deleteMessage(from, {
 					id: msgId,
@@ -602,74 +670,13 @@ export default async function (message: WAMessage): Promise<any> {
 					}
 					addCount('custom cmd');
 				});
-			} else if ((body || '').startsWith('xreturn ')) {
-				if (permission(['admin'])) return;
-				let ctype = Function;
-				const AsyncFunction = Object.getPrototypeOf(async () => {}).constructor;
-				if (/await/.test(body)) ctype = AsyncFunction;
-				const func = new ctype(
-					'print',
-					Object.keys(client)[0],
-					'from',
-					'message',
-					'body',
-					'require',
-					!/^return /.test(body.slice(8)) &&
-					body.slice(8).split('\n').length === 1
-						? 'return ' + body.slice(8)
-						: body.slice(8)
-				);
-				let output;
-				try {
-					output = func(
-						(...args: any) => {
-							reply(util.format(...args));
-						},
-						client,
-						from,
-						message,
-						body,
-						require,
-						(teks: string) =>
-							teks
-								.replace(
-									/^(async function|function|async).+\(.+?\).+{/,
-									"case 'command':"
-								)
-								.replace(/this\.(teks|url|args)/g, (_, teks) => {
-									switch (body) {
-										case 'teks':
-											return "args.join(' ')";
-										case 'args':
-											return 'args';
-										case 'url':
-											return 'args[0]';
-										default:
-											return _;
-									}
-								})
-								.replace(/}$/, '    break')
-					);
-					reply(util.format(output));
-				} catch (e) {
-					reply(util.format(e));
-				}
-			} else if ((body || '').startsWith('>> ')) {
-				if (permission(['admin'])) return;
-				const exec = body.slice(3).replace(';', '').replace('&&', '');
-				child.exec(exec, (error: any, stdout: any, stderr: any) => {
-					if (error) return reply('*[ERROR]*\n' + error.toString());
-					if (stdout) return reply('*[STDOUT]*\n' + stdout.toString());
-					if (stderr) return reply('*[STDERR]*\n' + stderr.toString());
-					return;
-				});
 			}
 		} else {
 			if (errCmd.includes(args[0].replace(prefix, '')))
 				return reply(`Maaf, perintah *${args[0]}* sedang mengalami error`);
 			if (pre('arch')) {
 				if (permission(['self'])) return;
-				pm2.describe(pm2Id, (err, res: any) => {
+				pm2.describe(setting.pm2Id, (err, res: any) => {
 					if (err) console.error(err);
 					const used = res[0].monit.memory / 1024 / 1024;
 					const hasil = stripIndents`*「 System Architecture 」*
@@ -681,10 +688,6 @@ export default async function (message: WAMessage): Promise<any> {
                 • Uptime: ${moment(res[0].pm2_env.pm_uptime).fromNow()}`;
 					reply(hasil);
 				});
-				// } else if (pre('info') || pre('changelog') || pre('changes')) {
-				//     if(permission(['self'])) return
-				//     let hasilx = info.replace('%state', state.status)
-				//     reply(hasilx)
 			} else if (pre('bug')) {
 				if (permission(['self'])) return;
 				const bug = getQuery('bug');
@@ -881,7 +884,7 @@ export default async function (message: WAMessage): Promise<any> {
 				if (!Buffer.isBuffer(res)) return reply(res);
 				client.sendMessage(from, res, sticker, {quoted: replyMode});
 			} else if (pre('menu') || pre('help')) {
-				pm2.describe(pm2Id, (err, res) => {
+				pm2.describe(setting.pm2Id, (err, res) => {
 					if (err) console.error(err);
 					let helps: string = template
 						.help()
@@ -1491,7 +1494,7 @@ export default async function (message: WAMessage): Promise<any> {
 				try {
 					const nulis = async (word: string) => {
 						const text = wrap(word, {width: 60});
-						im('../imagetemplate.jpg')
+						im('../image/template.jpg')
 							.command('convert')
 							.font('../fonts/Indie-Flower.ttf')
 							.out(
@@ -2233,6 +2236,86 @@ export default async function (message: WAMessage): Promise<any> {
 							});
 					});
 				}
+			} else if (pre('absen')) {
+				const strs = getQuery('absen');
+				const str: any = getQuotedText();
+				const hasil = Math.max.apply(null, str.match(/\d+\./g));
+				const i = str.indexOf(hasil) + hasil.toString().length;
+				client.deleteMessage(from, {
+					id: msgId,
+					remoteJid: from,
+					fromMe: true,
+				});
+				client.sendMessage(
+					from,
+					str
+						.toString()
+						.insert(
+							i + 1,
+							` ${strs ? strs : setting.absen}\n${
+								parseInt(hasil.toString().replace('.', '')) + 1 + '. '
+							}`
+						),
+					text
+				);
+			} else if (pre('genshin')) {
+				reply(genshin.addTraveler(serial));
+			} else if (pre('balance') || pre('bal')) {
+				reply(genshin.balance(serial));
+			} else if (pre('inventory') || pre('inv')) {
+				reply(genshin.profile(serial));
+			} else if (pre('buy')) {
+				if (secondParam('int')) {
+					reply(genshin.buy(serial, true));
+				} else {
+					reply(genshin.buy(serial, false));
+				}
+			} else if (pre('buy10')) {
+				if (secondParam('int')) {
+					reply(genshin.buy10(serial, true));
+				} else {
+					reply(genshin.buy10(serial, false));
+				}
+			} else if (pre('wish')) {
+				if (secondParam('standart')) {
+					let jmlh = getQuery('wish standart');
+					if (!jmlh) jmlh = 1;
+					const obj = genshin.wishStandart(serial, jmlh);
+					if (obj.img) {
+						client.sendMessage(from, obj.buffer!, image, {
+							caption: obj.text,
+							quoted: replyMode,
+						});
+					} else {
+						reply(obj.text);
+					}
+				} else if (secondParam('limited')) {
+					let jmlh = getQuery('wish limited');
+					if (!jmlh) jmlh = 1;
+					const obj = genshin.wishLimited(serial, jmlh);
+					if (obj.img) {
+						client.sendMessage(from, obj.buffer!, image, {
+							caption: obj.text,
+							quoted: replyMode,
+						});
+					} else {
+						reply(obj.text);
+					}
+				} else if (secondParam('weapon')) {
+					let jmlh = getQuery('wish weapon');
+					if (!jmlh) jmlh = 1;
+					const obj = genshin.wishWeapon(serial, jmlh);
+					if (obj.img) {
+						client.sendMessage(from, obj.buffer!, image, {
+							caption: obj.text,
+							quoted: replyMode,
+						});
+					} else {
+						reply(obj.text);
+					}
+				} else {
+					reply('Wish mode tidak ada!');
+				}
 			} else if (pre('cmdlist')) {
 				if (permission(['group'])) return;
 				groups
@@ -2252,7 +2335,7 @@ export default async function (message: WAMessage): Promise<any> {
 					if (fileSize(false) >= 10485760)
 						return reply('Maaf, file tidak boleh melebihi 10mb!');
 					const mime: any = message.message ?? [type];
-					client.downloadMessage(message).then(mediaData => {
+					client.downloadMessage(message, false).then(mediaData => {
 						groups
 							.addMedia(chatId, cmd, mediaData, mime.mimetype)
 							.then((res: any) => reply(res))
@@ -2391,7 +2474,7 @@ export default async function (message: WAMessage): Promise<any> {
 				const chkKurir = courir.includes(kurir.toLowerCase());
 				if (chkKurir === true) {
 					const ran = Math.floor(Math.random() * 3);
-					const api: any = axios
+					axios
 						.get(
 							`https://api.binderbyte.com/cekresi?awb=${resi}&api_key=${
 								apikeys.cekresi ?? [ran]
@@ -2463,7 +2546,7 @@ export default async function (message: WAMessage): Promise<any> {
 					client
 						.downloadMessage(message, true, `../temp/${msgId}.js`, false)
 						.then(res => {
-							obfuscate(true, res).then((res: any) => {
+							obfuscate(true, '', res).then((res: any) => {
 								if (res.type === 'file') {
 									client.sendMessage(
 										from,
@@ -2484,7 +2567,7 @@ export default async function (message: WAMessage): Promise<any> {
 						});
 				} else {
 					const code = getQuery('obfuscate');
-					obfuscate(false, undefined, code).then((res: any) => {
+					obfuscate(false, code).then((res: any) => {
 						if (res.type === 'file') {
 							client.sendMessage(from, fs.readFileSync(res.path), document, {
 								filename: 'result.js',
@@ -2693,7 +2776,7 @@ export default async function (message: WAMessage): Promise<any> {
 					setting.restartState = true;
 					setting.restartId = from;
 					db.push('/setting', setting, true);
-					pm2.restart(pm2Id, err => {
+					pm2.restart(setting.pm2Id, err => {
 						if (err) console.log(err);
 					});
 				} else if (secondParam('block')) {
@@ -3091,31 +3174,28 @@ export default async function (message: WAMessage): Promise<any> {
 							return reply(
 								`Maaf, perintah tidak valid, contoh :\n\n*${prefix}corona prov [provinsi]*`
 							);
-						const {data: data_18} = await axios.get(
+						axios.get(
 							'https://indonesia-covid-19.mathdro.id/api/provinsi/'
-						);
-						let founded = false;
-						data_18.data.find((i_15: any) => {
-							if (i_15.provinsi.toLowerCase() === province) {
-								founded = true;
-								return reply(stripIndents`_*「 Kasus COVID19 di ${
-									i_15.provinsi
-								} 」*_
-                                • Positif : ${intl(i_15.kasusPosi)} kasus   
-                                • Sembuh : ${intl(i_15.kasusSemb)} kasus
-                                • Meninggal : ${intl(i_15.kasusMeni)} kasus
-
-                                _*「 Tips Kesehatan 」*_
-                                - Mencuci tangan dengan benar
-                                - Menggunakan masker
-                                - Menjaga daya tahan tubuh
-                                - Menerapkan physical distancing
-
-                                _*「 XyZ BOT Information 」*_`);
-							}
-							return;
-						});
-						return;
+						).then(({data}) => {
+							data.data.map((i: any) => {
+								if (i.provinsi.toLowerCase() === province) {
+									return reply(stripIndents`_*「 Kasus COVID19 di ${
+										i.provinsi
+									} 」*_
+									• Positif : ${intl(i.kasusPosi)} kasus   
+									• Sembuh : ${intl(i.kasusSemb)} kasus
+									• Meninggal : ${intl(i.kasusMeni)} kasus
+	
+									_*「 Tips Kesehatan 」*_
+									- Mencuci tangan dengan benar
+									- Menggunakan masker
+									- Menjaga daya tahan tubuh
+									- Menerapkan physical distancing
+	
+									_*「 XyZ BOT Information 」*_`);
+								}
+							});
+						})
 					}
 				} else {
 					corona()
@@ -3573,7 +3653,7 @@ export default async function (message: WAMessage): Promise<any> {
 				client.downloadMessage(message, true).then(data => {
 					const img = sharp(data);
 					img.metadata().then((res: any) => {
-						if (!is_undefined(res.loop)) {
+						if (!res.loop) {
 							reply('Mohon bersabar, prosess mungkin saja lama...');
 							fs.writeFileSync('../temp/' + msgId + '.webp', data);
 							scrap

@@ -5,9 +5,7 @@
         "restartState": false,
         "restartId": "undefined",
         "prefix": "/",
-        "unSend": [
-            "6282158718024@s.whatsapp.net"
-        ],
+        "unSend": [],
         "autoRead": false,
         "autoReply": false,
         "pm2Id": "SELF",
@@ -15,7 +13,8 @@
         "fakeText": "_*「 XyZ BOT 」*_\n_made by @itzngga_",
         "fakeJid": "0@s.whatsapp.net",
         "antiVirtex": false,
-        "universalPublic": false
+        "universalPublic": false,
+        "absen": "Rangga Septian Hendiansyah"
     },
     "errCmd": [],
     "sticker": {
@@ -422,7 +421,7 @@
     },
     "count": {
         "help": {
-            "count": 91,
+            "count": 97,
             "type": "member"
         },
         "kapan": {
@@ -478,7 +477,7 @@
             "type": "member"
         },
         "list": {
-            "count": 0,
+            "count": 1,
             "type": "member"
         },
         "meme": {
@@ -486,7 +485,7 @@
             "type": "member"
         },
         "me": {
-            "count": 60,
+            "count": 62,
             "type": "member"
         },
         "food": {
@@ -522,7 +521,7 @@
             "type": "member"
         },
         "speed": {
-            "count": 188,
+            "count": 212,
             "type": "member"
         },
         "qrcode": {
@@ -598,7 +597,7 @@
             "type": "member"
         },
         "surah": {
-            "count": 0,
+            "count": 1,
             "type": "member"
         },
         "bmkg": {
@@ -638,7 +637,7 @@
             "type": "member"
         },
         "status": {
-            "count": 13,
+            "count": 14,
             "type": "member"
         },
         "bc": {
@@ -666,7 +665,7 @@
             "type": "member"
         },
         "ig": {
-            "count": 1,
+            "count": 3,
             "type": "member"
         },
         "twitter": {
@@ -710,7 +709,7 @@
             "type": "member"
         },
         "corona": {
-            "count": 0,
+            "count": 4,
             "type": "member"
         },
         "quoteit": {
@@ -762,7 +761,7 @@
             "type": "member"
         },
         "arch": {
-            "count": 9,
+            "count": 10,
             "type": "member"
         },
         "countpremi": {
@@ -806,7 +805,7 @@
             "type": "member"
         },
         "toimg": {
-            "count": 3,
+            "count": 7,
             "type": "member"
         },
         "inspect": {
@@ -830,7 +829,7 @@
             "type": "member"
         },
         "owner": {
-            "count": 1,
+            "count": 4,
             "type": "member"
         },
         "tulis": {
@@ -1026,11 +1025,11 @@
             "type": "member"
         },
         "unsend": {
-            "count": 4,
+            "count": 8,
             "type": "member"
         },
         "getobj": {
-            "count": 132,
+            "count": 134,
             "type": "member"
         },
         "autoread": {
@@ -1118,7 +1117,7 @@
             "type": "member"
         },
         "fakereply": {
-            "count": 31,
+            "count": 37,
             "type": "member"
         },
         "admin": {
@@ -1150,7 +1149,7 @@
             "type": "member"
         },
         "eval": {
-            "count": 151,
+            "count": 152,
             "type": "member"
         },
         "fisheye": {
@@ -1158,7 +1157,7 @@
             "type": "member"
         },
         "prefix": {
-            "count": 15,
+            "count": 17,
             "type": "member"
         },
         "online": {
@@ -1214,7 +1213,7 @@
             "type": "member"
         },
         "profile": {
-            "count": 2,
+            "count": 3,
             "type": "member"
         },
         "round": {
@@ -1230,7 +1229,7 @@
             "type": "member"
         },
         "obfuscate": {
-            "count": 8,
+            "count": 9,
             "type": "member"
         },
         "glist2": {
@@ -1239,6 +1238,30 @@
         },
         "epbug": {
             "count": 10,
+            "type": "member"
+        },
+        "genshin": {
+            "count": 11,
+            "type": "member"
+        },
+        "inv": {
+            "count": 26,
+            "type": "member"
+        },
+        "wish": {
+            "count": 159,
+            "type": "member"
+        },
+        "bal": {
+            "count": 9,
+            "type": "member"
+        },
+        "absen": {
+            "count": 23,
+            "type": "member"
+        },
+        "buy10": {
+            "count": 2,
             "type": "member"
         }
     }

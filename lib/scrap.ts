@@ -241,11 +241,13 @@ export default class Scrap {
           );
           await page.close();
         })
-        .catch(async () => {
+        .catch(async (error) => {
+          console.log(error);
           await page.close();
           return Promise.reject('Maaf, url tidak valid');
         });
     } catch (error) {
+      console.log(error);
       return Promise.reject('Maaf, url tidak valid');
     }
   }

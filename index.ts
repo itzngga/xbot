@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-namespace */
 import {
 	MessageType,
@@ -23,6 +24,7 @@ import fs from 'fs-extra';
 class main extends WAConnection {
 	public gameEvent: EventEmitter = new EventEmitter();
 	public waitmsg: Set<string> = new Set();
+	public _events: any
 
 	getFile = (url: string): Promise<getFileResponse> =>
 		new Promise((resolve, reject) => {
@@ -88,7 +90,7 @@ class main extends WAConnection {
 		return this.contactAddOrGet(jid);
 	}
 	generateFakeReply(fakeText: string) {
-		return WAMessageProto.WebMessageInfo.fromObject({
+		return {
 			key: {
 				fromMe: setting.fakeJid === this.user.jid,
 				participant: setting.fakeJid,
@@ -114,7 +116,7 @@ class main extends WAConnection {
 				},
 				status: WA_MESSAGE_STATUS_TYPE.PENDING,
 			},
-		});
+		} as any;
 	}
 	generateStory(status: any) {
 		return WAMessageProto.WebMessageInfo.fromObject({
@@ -131,7 +133,7 @@ class main extends WAConnection {
 	}
 	async downloadMessage(
 		message: WAMessage,
-		quoted?: boolean,
+		quoted: boolean,
 		path?: string,
 		ext?: boolean
 	): Promise<any> {
@@ -198,16 +200,27 @@ class main extends WAConnection {
 		options?: any,
 		fakeText?: string
 	): Promise<WAMessage> {
-		setting.fakeReply
-			? (quoted = this.generateFakeReply(
-					fakeText ? fakeText : setting.fakeText
-			  ))
-			: quoted;
 		return this.sendMessage(jid, text, MessageType.extendedText, {
-			quoted: quoted,
+			quoted: (setting.fakeReply ? this.generateFakeReply(fakeText || setting.fakeText) : quoted),
 			...options,
 		});
 	}
+	async forward(jid: string, message: WAMessage, forceForward = false, options = {}) {
+		const mtype = Object.keys(message.message!)[0]
+		const content = await this.generateForwardMessageContent(message, forceForward)
+		const ctype = Object.keys(content)[0];
+		const type: any = message.message ?? [mtype];
+		const contents: any = content ?? [ctype];
+		let context = {}
+		if (mtype !== MessageType.text) context = type.contextInfo!
+		contents.contextInfo = {
+		   ...context,
+		   ...contents.contextInfo
+		}
+		const waMessage = await this.prepareMessageFromContent(jid, content, options)
+		await this.relayWAMessage(waMessage)
+		return waMessage
+	  }
 	async fakeReply1(
 		jid: string,
 		text = '',
@@ -312,13 +325,15 @@ client.connect().then(() => {
 	const authInfo = client.base64EncodedAuthInfo();
 	fs.writeFileSync('./xyz.data.json', JSON.stringify(authInfo));
 });
-client.on('open', () => {
+client.once('connection-validated', () => {
 	if (!publicJid.has(client.user.jid)) {
 		publicJid.add(client.user.jid);
 		db.push('/publicJid', Array.from(publicJid), true);
 	}
 });
-client.on('CB:action,add:relay,message', (json: any) => {
+if (!Array.isArray(client._events['CB:action,add:relay,message'])) client._events['CB:action,add:relay,message'] = [client._events['CB:action,add:relay,message']]
+else client._events['CB:action,add:relay,message'] = [client._events['CB:action,add:relay,message'].pop()]
+client._events['CB:action,add:relay,message'].unshift(async (json: any) => {
 	const m = json[2][0][2];
 	if (
 		m.message &&
@@ -336,23 +351,14 @@ client.on('CB:action,add:relay,message', (json: any) => {
 			: a.participant
 			? a.participant
 			: key.remoteJid;
-		client.forwardMessage(key.remoteJid, a, false).then(waMessage => {
-			client.sendMessage(
-				key.remoteJid,
-				`*[UN-DELETE]*\n\nFrom: @${participant.replace(
-					/@.+/,
-					''
-				)}\nTime: ${moment().format('llll')}`,
-				MessageType.extendedText,
-				{
-					quoted: a,
-					contextInfo: {
-						mentionedJid: [participant],
-					},
+		const msg: any = a.constructor.fromObject(a.constructor.toObject(a))
+		await client.reply(key.remoteJid,
+		`*[UN-DELETE]*\n\nFrom: @${participant.split('@')[0]}\nTime: ${moment().format('llll')}`, msg, {
+				contextInfo: {
+				mentionedJid: [participant]
 				}
-			);
-			client.relayWAMessage(waMessage);
-		});
+			})
+		client.forward(key.remoteJid, msg).catch(e => console.log(e, msg))
 	}
 	return;
 });
@@ -367,10 +373,11 @@ client.on('chat-update', async chat => {
 	if (msg.key && msg.key.remoteJid === 'status@broadcast') return;
 	const serial: string = msg.key.fromMe
 		? client.user.jid
-		: msg.key.remoteJid?.includes('@g.us')
+		: msg.key.remoteJid?.endsWith('@g.us')
 		? msg.participant!
 		: msg.key.remoteJid!;
 	if (client.waitmsg.has(serial!)) client.gameEvent.emit(serial, msg);
+	if (!msg.key.fromMe && (setting.universalPublic || !publicJid.has(serial))) return;
 	return handle(msg);
 });
 export default client;

@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-namespace */
-import {db} from './db';
+import {db, genshin} from './db';
 import {Moment} from 'moment';
 import {
 	WAGroupMetadata,
@@ -19,6 +20,7 @@ export const textpro = db.getObject<string[]>('/textpro');
 export const publicJid = new Set(db.getObject<string[]>('/publicJid'));
 export const arryOfWords = db.getObject<string[]>('/arryOfWords');
 export const fakeReplyBase64: string = db.getObject('/fakeReplyBase64');
+export const traveller = genshin.getObject<travellerType>('/traveller');
 
 export const updateObj = (name: string) => {
 	eval(name);
@@ -48,6 +50,7 @@ export type settingType = {
 	fakeJid: string;
 	antiVirtex: boolean;
 	universalPublic: boolean;
+	absen: string;
 };
 
 export type waitMessageObj = {
@@ -191,8 +194,60 @@ export interface handlerType {
 	mentionedJidList: () => string[];
 }
 
-declare module '@adiwajshing/baileys' {
-	export interface ExtendedTextMessage {
-		donwload: (link: string) => {};
+export type travellerType = {
+	[user: string]: {
+		primogems: number;
+		interwined: number;
+		acquaint: number;
+		standard5pity: number;
+		standard4pity: number;
+		char5pity: number;
+		char4pity: number;
+		weap5pity: number;
+		weap4pity: number;
+		chars: string[];
+		weapons: string[];
+	};
+};
+
+export type standart = {
+	fiveStarChar: string[];
+	fiveStarWeap: string[];
+	fourStarChar: string[];
+	fourStarWeap: string[];
+	threeStarWeap: string[];
+};
+
+export type character = {
+	rate5up: string[];
+	rate4up: string[];
+	fiveStarChar: string[];
+	fourStarChar: string[];
+	fourStarWeap: string[];
+	threeStarWeap: string[];
+};
+
+export type weapon = {
+	rate5up: string[];
+	rate4up: string[];
+	fiveStarWeap: string[];
+	fourStarChar: string[];
+	fourStarWeap: string[];
+	threeStarWeap: string[];
+};
+
+export interface xjadiBot {
+	code: number;
+	target: string;
+	type: 'message' | 'broadcast' | 'update' | 'delete' | 'qr' | 'get-scan';
+	method?: 'send' | 'received' | 'get';
+	tjid?: string;
+	text?: string;
+	qr?: any;
+}
+declare global {
+	interface String {
+		splice(index: number, howmanys: number): string[];
+		insert(index: number, string: string): string;
 	}
 }
