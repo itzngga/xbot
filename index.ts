@@ -1,3 +1,4 @@
+import { autoLogin, DB, isHasLoginData } from './src/login';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-namespace */
 import {
@@ -12,20 +13,30 @@ import {
 	WAMessageProto,
 } from '@adiwajshing/baileys';
 import {EventEmitter} from 'events';
-import {getFileResponse, groupAcceptCode, waitMessageObj} from './types/index';
-import handle from './src';
 import axios from 'axios';
 import regexParser from 'regex-parser';
 import moment from 'moment';
-import {setting, fakeReplyBase64, publicJid} from './types';
-import {db} from './types/db';
-import fs from 'fs-extra';
+import { login, addLogin } from './src/login';
+import {getFileResponse, groupAcceptCode, waitMessageObj} from './types/index';
+import Handler from './src';
+const cfonts = require('cfonts');
+const qrcode = require('qrcode');
+export const jadiBot = new EventEmitter()
 
-class main extends WAConnection {
+cfonts.say('-----------------------------------------------------------------------', {font: 'console', gradient: ['green', '#f80']});
+		cfonts.say('XYZ BOT', {
+			font: 'block',
+			background: 'transparent',
+			gradient: ['green','#f80']
+		})
+		cfonts.say('-----------------------------------------------------------------------', {font: 'console', gradient: ['green', '#f80']});
+		console.log('•', '[INFO]', 'yellow', 'BOT Started!');
+export class Index extends WAConnection {
+	public client = Index.prototype
 	public gameEvent: EventEmitter = new EventEmitter();
 	public waitmsg: Set<string> = new Set();
-	public _events: any
-
+	public _events: any;
+	public DB!: DB
 	getFile = (url: string): Promise<getFileResponse> =>
 		new Promise((resolve, reject) => {
 			try {
@@ -92,8 +103,8 @@ class main extends WAConnection {
 	generateFakeReply(fakeText: string) {
 		return {
 			key: {
-				fromMe: setting.fakeJid === this.user.jid,
-				participant: setting.fakeJid,
+				fromMe: this.DB.setting.fakeJid === this.user.jid,
+				participant: this.DB.setting.fakeJid,
 				remoteJid: 'status@broadcast',
 			},
 			message: {
@@ -110,7 +121,7 @@ class main extends WAConnection {
 					fileEncSha256: '5HnGj+12PjaglwnPV0f7wmBI8YPzIEM8pKzc48GzNCg=',
 					directPath:
 						'/v/t62.7118-24/17614527_2526091537698863_5247917891246363081_n.enc?oh=22f044b9bf4c2067c022f100ba4eb806&oe=606A7E38',
-					jpegThumbnail: fakeReplyBase64,
+					jpegThumbnail: this.DB.fakeReplyBase64,
 					scansSidecar:
 						'p7FGNd6R/E5fgL0NkS9aiOzy24PgFs+sIw5QWyRW5QavTBxv6rAzcg==',
 				},
@@ -133,7 +144,7 @@ class main extends WAConnection {
 	}
 	async downloadMessage(
 		message: WAMessage,
-		quoted: boolean,
+		quoted?: any,
 		path?: string,
 		ext?: boolean
 	): Promise<any> {
@@ -201,13 +212,13 @@ class main extends WAConnection {
 		fakeText?: string
 	): Promise<WAMessage> {
 		return this.sendMessage(jid, text, MessageType.extendedText, {
-			quoted: (setting.fakeReply ? this.generateFakeReply(fakeText || setting.fakeText) : quoted),
+			quoted: (this.DB.setting.fakeReply ? this.generateFakeReply(fakeText || this.DB.setting.fakeText) : quoted),
 			...options,
 		});
 	}
 	async forward(jid: string, message: WAMessage, forceForward = false, options = {}) {
 		const mtype = Object.keys(message.message!)[0]
-		const content = await this.generateForwardMessageContent(message, forceForward)
+		const content = this.generateForwardMessageContent(message, forceForward)
 		const ctype = Object.keys(content)[0];
 		const type: any = message.message ?? [mtype];
 		const contents: any = content ?? [ctype];
@@ -217,7 +228,7 @@ class main extends WAConnection {
 		   ...context,
 		   ...contents.contextInfo
 		}
-		const waMessage = await this.prepareMessageFromContent(jid, content, options)
+		const waMessage = this.prepareMessageFromContent(jid, content, options)
 		await this.relayWAMessage(waMessage)
 		return waMessage
 	  }
@@ -239,7 +250,7 @@ class main extends WAConnection {
 	}
 	async fakeReply(jid: string, text = '', contextInfo?: any) {
 		return this.sendMessage(jid, text.toString(), MessageType.extendedText, {
-			quoted: this.generateFakeReply(setting.fakeText),
+			quoted: this.generateFakeReply(this.DB.setting.fakeText),
 			contextInfo: contextInfo,
 		});
 	}
@@ -264,7 +275,7 @@ class main extends WAConnection {
 						: type === 'imageMessage'
 						? msg.message.imageMessage.caption
 						: type === 'videoMessage'
-						? msg.message.videoMessage.caption
+						? msg.paramsmessage.videoMessage.caption
 						: type === 'extendedTextMessage'
 						? msg.message.extendedTextMessage.text
 						: '';
@@ -318,66 +329,91 @@ class main extends WAConnection {
 		});
 	}
 }
-const client = new main();
-client.gameEvent.setMaxListeners(0);
-fs.existsSync('../xyz.data.json') && client.loadAuthInfo('../xyz.data.json');
-client.connect().then(() => {
-	const authInfo = client.base64EncodedAuthInfo();
-	fs.writeFileSync('./xyz.data.json', JSON.stringify(authInfo));
-});
-client.once('connection-validated', () => {
-	if (!publicJid.has(client.user.jid)) {
-		publicJid.add(client.user.jid);
-		db.push('/publicJid', Array.from(publicJid), true);
-	}
-});
-if (!Array.isArray(client._events['CB:action,add:relay,message'])) client._events['CB:action,add:relay,message'] = [client._events['CB:action,add:relay,message']]
-else client._events['CB:action,add:relay,message'] = [client._events['CB:action,add:relay,message'].pop()]
-client._events['CB:action,add:relay,message'].unshift(async (json: any) => {
-	const m = json[2][0][2];
-	if (
-		m.message &&
-		m.message.protocolMessage &&
-		m.message.protocolMessage.type === 0
-	) {
-		const key = m.message.protocolMessage.key;
-		if (key.remoteJid === 'status@broadcast') return;
-		if (!setting.unSend.includes(key.remoteJid)) return;
-		if (key.fromMe) return;
-		const c = client.chats.get(key.remoteJid);
-		const a = c.messages.dict[`${key.id}|${key.fromMe ? 1 : 0}`];
-		const participant = key.fromMe
-			? client.user.jid
-			: a.participant
-			? a.participant
-			: key.remoteJid;
-		const msg: any = a.constructor.fromObject(a.constructor.toObject(a))
-		await client.reply(key.remoteJid,
-		`*[UN-DELETE]*\n\nFrom: @${participant.split('@')[0]}\nTime: ${moment().format('llll')}`, msg, {
-				contextInfo: {
-				mentionedJid: [participant]
-				}
+export class Main extends Index {
+	handle: any;
+	constructor(targetJid?: string, jadibot?: any) {
+		super()
+		this.client = new Index()
+		this.client.connectOptions.connectCooldownMs = 60000
+		this.client.connectOptions.maxRetries = 0
+		isHasLoginData(targetJid ? targetJid : '6281297980063@s.whatsapp.net') && this.client.loadAuthInfo(login(targetJid ? targetJid : '6281297980063@s.whatsapp.net'))
+		jadibot && (jadibot.type === 'qr') && this.client.on('qr', async qr => {
+			jadiBot.emit('message', {
+				type: 'image',
+				from: jadibot.from,
+				text: 'Scan QR ini untuk jadi bot sementara\n\n1. Klik titik tiga di pojok kanan atas\n2. Ketuk WhatsApp Web\n3. Scan QR ini',
+				buffer: Buffer.from((await qrcode.toDataURL(qr, { scale: 8 })).split(',')[1], 'base64')
 			})
-		client.forward(key.remoteJid, msg).catch(e => console.log(e, msg))
+		  })
+		this.client.connect().then(({user}) => {
+			try {
+				!isHasLoginData(user.jid) && addLogin(user.jid, this.client.base64EncodedAuthInfo())
+				this.DB = new DB(user.jid)
+				this.handle = new Handler(this.client, this.DB)
+				this.client.DB = this.DB
+				jadibot && jadiBot.emit('message', {
+					type: 'text',
+					from: jadibot.from,
+					text: `Berhasil login!\n\nGunakan ${this.DB.setting.prefix}help untuk melihat menu`
+				})
+			} catch (error) {
+				console.log(error);
+			}
+		});
+		this.gameEvent.setMaxListeners(0);
+		if (!Array.isArray(this.client._events['CB:action,add:relay,message'])) this.client._events['CB:action,add:relay,message'] = [this.client._events['CB:action,add:relay,message']]
+		else this.client._events['CB:action,add:relay,message'] = [this.client._events['CB:action,add:relay,message'].pop()]
+		this.client._events['CB:action,add:relay,message'].unshift(async (json: any) => {
+			const m = json[2][0][2];
+			if (
+				m.message &&
+				m.message.protocolMessage &&
+				m.message.protocolMessage.type === 0
+			) {
+				const key = m.message.protocolMessage.key;
+				if (key.remoteJid === 'status@broadcast') return;
+				if (!this.client.DB.setting.unSend.includes(key.remoteJid)) return;
+				if (key.fromMe) return;
+				const c = this.client.chats.get(key.remoteJid);
+				const a = c.messages.dict[`${key.id}|${key.fromMe ? 1 : 0}`];
+				const participant = key.fromMe
+					? this.client.user.jid
+					: a.participant
+					? a.participant
+					: key.remoteJid;
+				const msg: any = a.constructor.fromObject(a.constructor.toObject(a))
+				await this.client.reply(key.remoteJid,
+				`*[UN-DELETE]*\n\nFrom: @${participant.split('@')[0]}\nTime: ${moment().format('llll')}`, msg, {
+						contextInfo: {
+						mentionedJid: [participant]
+						}
+					})
+				this.client.forward(key.remoteJid, msg).catch(e => console.log(e, msg))
+			}
+			return;
+		});
+		this.client.on('CB:action,,call', async json => {
+			const callerId = json[2][0][1].from;
+			console.log(`[WARN] ${callerId.split('@')[0]} is calling!`);
+		});
+		this.client.on('chat-update', async chat => {
+			if (!chat.hasNewMessage || typeof chat.messages === 'undefined') return;
+			const msg = chat.messages.first;
+			if (!msg.message) return;
+			if (msg.key && msg.key.remoteJid === 'status@broadcast') return;
+			const serial: string = msg.key.fromMe
+				? this.client.user.jid
+				: msg.key.remoteJid?.endsWith('@g.us')
+				? msg.participant!
+				: msg.key.remoteJid!;
+			if (this.client.waitmsg.has(serial!)) this.client.gameEvent.emit(serial, msg);
+			if (!msg.key.fromMe && (this.client.DB.setting.universalPublic || !this.DB.publicJid.has(serial))) return;
+			return this.handle.handle(msg);
+		});
 	}
-	return;
-});
-client.on('CB:action,,call', async json => {
-	const callerId = json[2][0][1].from;
-	console.log(`[WARN] ${callerId.split('@')[0]} is calling!`);
-});
-client.on('chat-update', async chat => {
-	if (!chat.hasNewMessage || typeof chat.messages === 'undefined') return;
-	const msg = chat.messages.first;
-	if (!msg.message) return;
-	if (msg.key && msg.key.remoteJid === 'status@broadcast') return;
-	const serial: string = msg.key.fromMe
-		? client.user.jid
-		: msg.key.remoteJid?.endsWith('@g.us')
-		? msg.participant!
-		: msg.key.remoteJid!;
-	if (client.waitmsg.has(serial!)) client.gameEvent.emit(serial, msg);
-	if (!msg.key.fromMe && (setting.universalPublic || !publicJid.has(serial))) return;
-	return handle(msg);
-});
-export default client;
+}
+
+new Main()
+autoLogin && Array.from(autoLogin).map(x => {
+	new Main(x)
+})

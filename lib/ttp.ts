@@ -1,6 +1,6 @@
-const fs: any = require('fs-extra');
-const text2png: any = require('text2png');
-const {spawn}: any = require('child_process');
+import fs from 'fs-extra';
+const text2png = require('text2png');
+const {spawn} = require('child_process');
 
 export const attp = (text: string): Promise<Buffer> =>
   new Promise((resolve, reject) => {
@@ -55,8 +55,8 @@ export const attp = (text: string): Promise<Buffer> =>
     }
   });
 
-export const harta = (text: string): Promise<Buffer> =>
-  new Promise(async (resolve, reject) => {
+export const harta = async (text: string): Promise<Buffer> =>
+  new Promise((resolve, reject) => {
     try {
       Promise.all([
         createHarta(text, 1),
@@ -152,7 +152,7 @@ async function canvasx(
   color: string,
   i: number,
   text: string
-): Promise<Buffer> {
+): Promise<Buffer | void> {
   return fs.writeFile(
     './gif/frames/frame' + i + '.png',
     text2png(wordWrap(text, 8), {

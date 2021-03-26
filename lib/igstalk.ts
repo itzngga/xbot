@@ -1,7 +1,6 @@
 import axios from 'axios';
-import {igstalk, config} from '../types/index';
-
-export default function (target: string): Promise<igstalk> {
+import {igstalk} from '../types/index';
+export default function (target: string, igCookie: string): Promise<igstalk> {
   return new Promise((resolve, reject) => {
     axios
       .get(`https://www.instagram.com/${target}/?__a=1`, {
@@ -12,7 +11,7 @@ export default function (target: string): Promise<igstalk> {
           'accept-language': 'en-US,en;q=0.9,id;q=0.8',
           'cache-control': 'max-age=0',
           'upgrade-insecure-requests': '1',
-          cookie: config.igCookie,
+          cookie: igCookie,
           'user-agent':
             'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.190 Safari/537.36',
         },

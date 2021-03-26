@@ -1,26 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-namespace */
-import {db, genshin} from './db';
 import {Moment} from 'moment';
 import {
 	WAGroupMetadata,
 	WAGroupParticipant,
 	WAMessage,
 } from '@adiwajshing/baileys';
-
-export const dirname = require.main?.path;
-export const setting = db.getObject<settingType>('/setting');
-export const errCmd = db.getObject<string[]>('/errCmd');
-export const sticker = db.getObject<stickerType>('/sticker');
-export const config = db.getObject<configType>('/config');
-export const reply = db.getObject<reply>('/reply');
-export const cloud = db.getObject<cloud>('/cloud');
-export const count = db.getObject<countType>('/count');
-export const textpro = db.getObject<string[]>('/textpro');
-export const publicJid = new Set(db.getObject<string[]>('/publicJid'));
-export const arryOfWords = db.getObject<string[]>('/arryOfWords');
-export const fakeReplyBase64: string = db.getObject('/fakeReplyBase64');
-export const traveller = genshin.getObject<travellerType>('/traveller');
 
 export const updateObj = (name: string) => {
 	eval(name);
@@ -99,11 +84,11 @@ export interface configType {
 	igCookie: string;
 }
 
-export type reply = {
+export type autoReply = {
 	[key: string]: {
 		answer: string;
 	};
-};
+}
 
 export type group = {
 	gid: string;
@@ -244,6 +229,14 @@ export interface xjadiBot {
 	tjid?: string;
 	text?: string;
 	qr?: any;
+}
+
+export type loginData = {
+	clientID: string;
+	serverToken: string;
+	clientToken: string;
+	encKey: string;
+	macKey: string;
 }
 declare global {
 	interface String {

@@ -1,6 +1,7 @@
+import fs from 'fs-extra'
 import moment from 'moment';
 import jsObfuscate from 'javascript-obfuscator';
-const fs: any = require('fs-extra');
+
 const confuscate: any = {
 	compact: true,
 	controlFlowFlattening: false,
@@ -32,7 +33,7 @@ const confuscate: any = {
 	transformObjectKeys: true,
 };
 
-export default (file: boolean, code: string, path?: string) =>
+export default (file: boolean, code: string, path?: any) =>
 	new Promise((resolve, reject) => {
 		try {
 			if (file) {

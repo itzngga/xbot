@@ -1,62 +1,57 @@
-import {cloud, config} from '../types';
-import {db} from '../types/db';
-const fs: any = require('fs-extra');
-const cryptojs: any = require('crypto-js');
-const {secret} = config;
-
-function getHash(key: string): string {
-  return cryptojs.HmacSHA256(key, secret).toString();
-}
-function saveJSON(): void {
-  return db.push('/cloud', cloud, true);
-}
-
-export const findCloud = (id: string): Promise<string> =>
-  new Promise((resolve, reject) => {
-    const key = getHash(id);
-    if (cloud.hasOwnProperty(key)) {
-      return resolve(cloud[key]!.path);
-    } else {
-      return reject('Anda belum mengupload file apapun ke cloud!');
+import fs from 'fs-extra'
+import { DB } from 'src/login';
+import { cloud, configType } from 'types';
+const cryptojs = require('crypto-js');
+export default class Cloud {
+  private cloud: cloud
+  private config: configType
+  constructor(private DB: DB){
+    this.cloud = this.DB.cloud
+    this.config = this.DB.config
+  }
+  rawCloud (path: string, format: string, time: string){
+    return {
+      path: path,
+      format: format,
+      timestamp: time,
+    };
+  }
+  saveJSON() {
+      return this.DB.cloud = this.cloud
     }
-  });
-
-export const addCloud = (
-  asu: string,
-  buffer: Buffer,
-  format: string,
-  time: string
-): Promise<string> =>
-  new Promise((resolve, reject) => {
-    const id = getHash(asu);
-    if (!cloud.hasOwnProperty(id)) {
-      cloud[id] = rawCloud('../cloud/' + id + '.' + format, format, time);
-      fs.writeFile('../cloud/' + id + '.' + format, buffer).then(() => {
-        saveJSON();
-        return resolve('Sukses menambah file ke cloud!');
+  getHash(key: string): string {
+    return cryptojs.HmacSHA256(key, this.config.secret).toString();
+  }
+  findCloud (id: string): Promise<string> {
+    const key = this.getHash(id);
+    if (Object.prototype.hasOwnProperty.call(this.cloud, key)) {
+      return Promise.resolve(this.cloud[key]!.path);
+    } else {
+      return Promise.reject('Anda belum mengupload file apapun ke cloud!');
+    }
+  }
+  async addCloud(asu: string,buffer: Buffer,format: string,time: string): Promise<string>{
+      const id = this.getHash(asu);
+      if (!Object.prototype.hasOwnProperty.call(this.cloud, id)) {
+        this.cloud[id] = this.rawCloud('../cloud/' + id + '.' + format, format, time);
+        return fs.writeFile('../cloud/' + id + '.' + format, buffer).then(() => {
+          this.saveJSON();
+          return Promise.resolve('Sukses menambah file ke cloud!');
+        });
+      } else {
+        return Promise.reject('Maaf, setiap user hanya boleh menyimpan 1 file di cloud!');
+      }
+    }
+  async removeCloud(asu: string): Promise<string>{
+    const id = this.getHash(asu);
+    if (Object.prototype.hasOwnProperty.call(this.cloud, id)) {
+      return fs.unlink('../cloud/' + id + '.' + this.cloud[id]?.format).then(() => {
+        delete this.cloud[id];
+        this.saveJSON();
+        return Promise.resolve('File cloud berhasil di hapus!');
       });
     } else {
-      return reject('Maaf, setiap user hanya boleh menyimpan 1 file di cloud!');
+      return Promise.reject('Anda belum mengupload file apapun ke cloud!');
     }
-  });
-
-export const removeCloud = (asu: string): Promise<string> =>
-  new Promise((resolve, reject) => {
-    const id = getHash(asu);
-    if (cloud.hasOwnProperty(id)) {
-      fs.unlink('../cloud/' + id + '.' + cloud[id]?.format).then(() => {
-        delete cloud[id];
-        saveJSON();
-        return resolve('File cloud berhasil di hapus!');
-      });
-    } else {
-      return reject('Anda belum mengupload file apapun ke cloud!');
-    }
-  });
-const rawCloud = (path: string, format: string, time: string) => {
-  return {
-    path: path,
-    format: format,
-    timestamp: time,
-  };
-};
+  }
+}

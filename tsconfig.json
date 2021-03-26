@@ -3,6 +3,7 @@
     "rootDir": "./",
     "baseUrl": "./",
     "outDir": "dist",
+    "target": "ES2020",
     "noEmitOnError": false,
     "esModuleInterop": true,
     "sourceMap": false,

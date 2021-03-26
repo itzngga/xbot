@@ -1,11 +1,8 @@
-import {setting} from '../types';
-//Copy template = take down BOT!
-export function help() {
-  const prefix = setting.prefix;
+export function help(prefix: string) {
   const hasil = `*「 XyZ SELF 」*
 
 *MAIN*
-• prefix:*「$prefix」*
+• prefix: *「$prefix」*
 • name: *$name*
 • creator: *@itzngga*
 • cmd-count: *$hit times*
@@ -246,8 +243,7 @@ export function help() {
 _*「 XyZ BOT Automation 」*_`;
   return hasil;
 }
-export function quality() {
-  const prefix = setting.prefix;
+export function quality(prefix: string) {
   return `*Animated Sticker Quality*
 • *1*
 very high, cocok untuk video pendek
@@ -278,8 +274,7 @@ terus aktif dan update%%%.
   hasil = hasil.replace(/%%%/g, '```');
   return hasil;
 }
-export function cloudHelp() {
-  const prefix = setting.prefix;
+export function cloudHelp(prefix: string) {
   return `*XyZ BOT Cloud*
 
 • Apa itu cloud?

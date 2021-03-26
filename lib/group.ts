@@ -1,8 +1,7 @@
 /* eslint-disable prefer-spread */
 /* eslint-disable prefer-rest-params */
+import fs from 'fs-extra';
 import {group} from '../types';
-
-const fs: any = require('fs-extra');
 
 if (typeof Array.prototype.splice === 'undefined') {
   Array.prototype.splice = function (index: number, howmanys: number) {

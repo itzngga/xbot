@@ -1,5 +1,5 @@
-const fs: any = require('fs-extra');
-const ffmpeg: any = require('fluent-ffmpeg');
+import fs from 'fs-extra';
+import ffmpeg from 'fluent-ffmpeg';
 const {spawn} = require('child_process');
 import {Readable} from 'stream';
 

@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-self-assign */
-const fs: any = require('fs-extra');
-import client from '../index';
 import {createCanvas, registerFont} from 'canvas';
 import {MessageType, WAContextInfo, WAMessage} from '@adiwajshing/baileys';
+import fs from 'fs-extra';
+import { Index } from 'index';
 const pool = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ23456789'.split(
   ''
 );
@@ -19,31 +20,6 @@ registerFont('../fonts/Captcha.ttf', {family: 'Captcha'});
 
 // bj 10-30 / undefined
 // csn kebanyakan
-const sendText = async (
-  from: string,
-  teks: string,
-  context?: WAContextInfo
-) => {
-  return client.sendMessage(
-    from,
-    teks,
-    MessageType.text,
-    context ? {contextInfo: context} : {}
-  );
-};
-const reply = async (
-  from: string,
-  teks: string,
-  msg: any,
-  context?: WAContextInfo
-) => {
-  return client.sendMessage(
-    from,
-    teks,
-    MessageType.text,
-    context ? {quoted: msg, contextInfo: context} : {quoted: msg}
-  );
-};
 function randomText(len: number): string {
   const result = [];
   for (let i = 0; i < len; i++)
@@ -55,6 +31,34 @@ function is_undefined(input: string): boolean {
   return input === u;
 }
 export default class Game {
+  constructor(private client: Index){
+    this.client = client
+  }
+  async sendText (
+    from: string,
+    teks: string,
+    context?: WAContextInfo
+  ) {
+    return this.client.sendMessage(
+      from,
+      teks,
+      MessageType.text,
+      context ? {contextInfo: context} : {}
+    );
+  }
+  async reply (
+    from: string,
+    teks: string,
+    msg: any,
+    context?: WAContextInfo
+  ) {
+    return this.client.sendMessage(
+      from,
+      teks,
+      MessageType.text,
+      context ? {quoted: msg, contextInfo: context} : {quoted: msg}
+    );
+  }
   async capca(
     from: string,
     serial: string,
@@ -62,7 +66,7 @@ export default class Game {
   ): Promise<WAMessage | void> {
     try {
       if (game.has(serial))
-        return client.sendMessage(
+        return this.client.sendMessage(
           from,
           'Mohon selesaikan game sebelumnya!',
           MessageType.text,
@@ -79,14 +83,14 @@ export default class Game {
       ctx.font = '26px Captcha';
       ctx.rotate(-0.05);
       ctx.strokeText(teks, 15, 26);
-      await client.sendMessage(from, canvas.toBuffer(), MessageType.image, {
+      await this.client.sendMessage(from, canvas.toBuffer(), MessageType.image, {
         caption: 'Anda memiliki waktu 15 detik untuk menebak apa ini',
         quoted: message,
       });
-      client
+      this.client
         .waitMessage({type: 'text', query: teks, sender: serial}, 15000)
         .then(res => {
-          client.sendMessage(
+          this.client.sendMessage(
             from,
             'Good Job, Jawaban anda benar!',
             MessageType.text,
@@ -95,7 +99,7 @@ export default class Game {
           game.delete(serial);
         })
         .catch(() => {
-          client.sendMessage(
+          this.client.sendMessage(
             from,
             'Maaf, waktu habis!\n\nJawabanya adalah *' + teks + '*',
             MessageType.text,
@@ -114,7 +118,7 @@ export default class Game {
   ): Promise<WAMessage | void> {
     try {
       if (game.has(serial))
-        return client.sendMessage(
+        return this.client.sendMessage(
           from,
           'Mohon selesaikan game sebelumnya!',
           MessageType.text,
@@ -123,16 +127,16 @@ export default class Game {
       game.add(serial);
       const quiz = cakLontong[Math.floor(Math.random() * cakLontong.length)];
       quiz.answer = quiz.answer.toLowerCase();
-      await client.sendMessage(
+      await this.client.sendMessage(
         from,
         `*Anda memiliki waktu 15detik untuk menjawab pertanyaan dibawah.*\n\n${quiz.quiz}`,
         MessageType.text,
         {quoted: message}
       );
-      client
+      this.client
         .waitMessage({type: 'text', query: quiz.answer, sender: serial}, 15000)
         .then(res => {
-          client.sendMessage(
+          this.client.sendMessage(
             from,
             'Jawaban anda benar!\n\n' + quiz.detail,
             MessageType.text,
@@ -141,7 +145,7 @@ export default class Game {
           game.delete(serial);
         })
         .catch(() => {
-          client.sendMessage(
+          this.client.sendMessage(
             from,
             'Maaf, waktu habis!\n\nJawabanya adalah *' +
               quiz.answer +
@@ -182,7 +186,7 @@ export default class Game {
     };
     try {
       if (game.has(serial))
-        return client.sendMessage(
+        return this.client.sendMessage(
           from,
           'Mohon selesaikan game sebelumnya!',
           MessageType.text,
@@ -210,19 +214,19 @@ export default class Game {
           break;
       }
       answer = answer.toString().replace('*', '×');
-      client.sendMessage(
+      this.client.sendMessage(
         from,
         `*Anda memiliki waktu 15detik untuk menjawab pertanyaan dibawah.*\n\n${value1} ${operation} ${value2}`,
         MessageType.text,
         {quoted: message}
       );
-      client
+      this.client
         .waitMessage(
           {type: 'text', query: answer.toString(), sender: serial},
           15000
         )
         .then(res => {
-          client.sendMessage(
+          this.client.sendMessage(
             from,
             'Good Job, Jawaban anda benar!',
             MessageType.text,
@@ -231,7 +235,7 @@ export default class Game {
           game.delete(serial);
         })
         .catch(() => {
-          client.sendMessage(
+          this.client.sendMessage(
             from,
             'Maaf, waktu habis!\n\nJawabanya adalah *' +
               answer.toString() +
@@ -249,7 +253,7 @@ export default class Game {
     const slotOne = Math.floor(Math.random() * slots.length);
     const slotTwo = Math.floor(Math.random() * slots.length);
     const slotThree = Math.floor(Math.random() * slots.length);
-    return reply(
+    return this.reply(
       from,
       stripIndents`
 			\`\`\`╭ : : SLOTS : : ╮
@@ -286,11 +290,11 @@ export default class Game {
     message: WAMessage
   ): Promise<WAMessage> {
     if (game.has(gid))
-      return reply(gid, 'Tolong tunggu game sebelumnya berakhir!', message);
+      return this.reply(gid, 'Tolong tunggu game sebelumnya berakhir!', message);
     game.add(gid);
     try {
       if (!opponent.bot) {
-        await client.sendMessage(
+        await this.client.sendMessage(
           gid,
           `@${opponent.id.replace(
             '@s.whatsapp.net',
@@ -299,7 +303,7 @@ export default class Game {
           MessageType.text,
           {quoted: message, contextInfo: {mentionedJid: [opponent.id]}}
         );
-        const verification = await client
+        const verification = await this.client
           .waitMessage(
             {type: 'regex', query: '/yes|no/g', sender: opponent.id},
             15000
@@ -315,7 +319,7 @@ export default class Game {
           });
         if (!verification) {
           game.delete(gid);
-          return reply(gid, 'Sepertinya dia menolak...', message);
+          return this.reply(gid, 'Sepertinya dia menolak...', message);
         }
       }
       const sides = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
@@ -332,7 +336,7 @@ export default class Game {
             opponent: 'o',
           });
         } else {
-          await client.sendMessage(
+          await this.client.sendMessage(
             gid,
             stripIndents`
 						@${user.id.replace(
@@ -344,7 +348,7 @@ export default class Game {
             MessageType.text,
             {quoted: message, contextInfo: {mentionedJid: [user.id]}}
           );
-          await client
+          await this.client
             .waitMessage(
               {type: 'regex', query: '/[0-9]|end/g', sender: user.id},
               30000
@@ -353,7 +357,7 @@ export default class Game {
               choice = res.body[0];
               if (choice === 'end') return true;
               if (taken.includes(choice)) {
-                sendText(gid, 'Maaf, box tersebut telah terpakai!');
+                this.sendText(gid, 'Maaf, box tersebut telah terpakai!');
                 choice = Math.floor(Math.random() * sides.length);
                 return true;
               }
@@ -381,27 +385,27 @@ export default class Game {
       }
       game.delete(gid);
       if (winner === 'tie')
-        return reply(
+        return this.reply(
           gid,
           stripIndents`
                 Game ini berakhir seri!\n\n${this.displayBoard(sides)}`,
           message
         );
       if (!is_undefined(winner.bot))
-        return reply(
+        return this.reply(
           gid,
           stripIndents`
                 Bot XyZ menang!\n\n${this.displayBoard(sides)}`,
           message
         );
       if (winner === 'time')
-        return reply(
+        return this.reply(
           gid,
           stripIndents`Game otomatis berakhir karena tidak ada respon.
                 \n${this.displayBoard(sides)}`,
           message
         );
-      return client.sendMessage(
+      return this.client.sendMessage(
         gid,
         stripIndents`
 				Game ini dimenangkan oleh, @${winner.id.replace('@s.whatsapp.net', '')}!\n
