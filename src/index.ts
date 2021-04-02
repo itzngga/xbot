@@ -313,7 +313,7 @@ export default class Handler {
 			setCountAsMember,
 		} = new impCount(this.DB)
 		async function getPic (serial: string): Promise<any> {
-			return client
+			client
 				.getProfilePicture(serial)
 				.then(res => {
 					getBuffer(res).then(res2 => {
@@ -332,7 +332,7 @@ export default class Handler {
 				const jancok = await client.sendMessage(obj.from, obj.buffer, image, {filename: 'image.png', caption: obj.text, quoted: client.generateFakeReply(setting.fakeText), mimetype: Mimetype.png})
 				setTimeout(() => {
 					client.deleteMessage(obj.from, jancok.key);
-				  }, 30000)
+				  }, 15000)
 			}
 		})
 		this.handle = async (message: WAMessage) => {
@@ -774,7 +774,7 @@ export default class Handler {
 						}
 					} else if (pre('sticker') || pre('stiker')) {
 						if (isImage) {
-							client.downloadMessage(message, true).then(data => {
+							client.downloadMessage(message, quotedMsgObj() ? true : false).then(data => {
 								sharp(data)
 									.resize({
 										width: 512,
@@ -799,7 +799,7 @@ export default class Handler {
 										prefix +
 										'quality'
 								);
-							client.downloadMessage(message, true).then(data => {
+							client.downloadMessage(message, quotedMsgObj() ? true : false).then(data => {
 								gify(msgId, data, kualitas).then(res => {
 									client.sendMessage(from, res, sticker, {quoted: replyMode});
 								});
@@ -921,7 +921,30 @@ export default class Handler {
 							reply('Maaf, perintah tidak valid');
 						}
 					} else if (pre('inspect') || pre('detect')) {
-						if (isMedia || isQuotedImage) {
+						if(isQuotedAudio){
+							client.downloadMessage(message, isQuoted).then(async res => {
+								const lang = () => {
+									const anjy = getQuery('detect')
+									if(anjy.includes('id')) return 'id-ID'
+									if(anjy.includes('en')) return 'en-US'
+									return 'en-US'
+								}
+								ffmpeg(buffer2Stream(res))
+								.noVideo()
+								.audioCodec('pcm_s16le')
+								.audioChannels(2)
+								.addOptions(['-ar', '44100'])
+								.save('../temp/'+msgId+'.wav')
+								.on('end', () => {
+									const py = child.spawn('python', ['../speech.py', msgId, lang()])
+									py.stderr.on('data', (res: any) => console.log(res.toString()))
+									py.stdout.on('data', (res: any) => {
+										reply(res.toString())
+										fs.unlink('../temp/'+msgId+'.wav', () => {})
+									})
+								});
+							})
+						}else if (isMedia || isQuotedImage) {
 							const first = moment();
 							client
 								.downloadMessage(message, true, '../temp/' + msgId)
@@ -1898,7 +1921,7 @@ export default class Handler {
 							reply('Sukses upstory text!');
 						}
 					} else if (pre('ss') || pre('screenshot')) {
-						let web = quotedMsgObj() ? getQuotedText() : args[1];
+						let web = getQuery('ss');
 						if (!web)
 							return reply(
 								'Maaf, perintah tidak valid!\n\ncontoh: *' + prefix + 'ss [url]*'
@@ -1915,7 +1938,7 @@ export default class Handler {
 							})
 							.catch(() => reply('[GAGAL] url tidak valid!'));
 					} else if (pre('ss2') || pre('screenshot2')) {
-						let web = quotedMsgObj() ? getQuotedText() : args[1];
+						let web = getQuery('ss2');
 						if (!web)
 							return reply(
 								'Maaf, perintah tidak valid!\n\ncontoh: *' + prefix + 'ss [url]*'
@@ -2534,16 +2557,20 @@ export default class Handler {
 								reply(err);
 							});
 					} else if (pre('trial')) {
-						if(isHasLoginData(serial)) return reply('Maaf, bot anda sudah melakukan trial disini')
-						const jancok = new Main(serial, {
+						const target = mentionedJidList()[0] ? mentionedJidList()[0] : serial
+						if(isHasLoginData(target)) return reply('Maaf, bot anda sudah melakukan trial disini')
+						const jancok = new Main(target, {
 							type: 'qr',
 							from,
-							serial
+							target
 						})
 						setTimeout(() => {
-							if(!isHasLoginData(serial)) jancok.close()
-							else connectedBOT.set(serial, jancok)
-						}, 60000)
+							if(isHasLoginData(target)){
+								connectedBOT.set(target, jancok)
+							}else{
+								jancok.client.close()
+							}
+						}, 15000)
 					} else if (pre('login')) {
 						if(!isHasLoginData(serial)) return reply('Maaf, bot anda belum melakukan trial disini')
 						if(isEnable(args[1])){
@@ -2562,7 +2589,7 @@ export default class Handler {
 						if(permission(['self'])) return
 						if(!isHasLoginData(serial)) return reply('Maaf, bot anda sudah melakukan trial disini')
 						const anjay = connectedBOT.get(serial)
-						anjay?.close()
+						anjay?.client.close()
 						connectedBOT.delete(serial)
 						reply('Sukses Logout!')
 					} else if (pre('obfuscate')) {

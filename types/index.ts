@@ -36,6 +36,7 @@ export type settingType = {
 	antiVirtex: boolean;
 	universalPublic: boolean;
 	absen: string;
+	voiceCmd: boolean;
 };
 
 export type waitMessageObj = {

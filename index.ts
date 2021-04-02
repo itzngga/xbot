@@ -37,6 +37,16 @@ export class Index extends WAConnection {
 	public waitmsg: Set<string> = new Set();
 	public _events: any;
 	public DB!: DB
+
+	constructor() {
+		super()
+		this.connectOptions = {
+			maxIdleTimeMs: 60_000,
+			maxRetries: 0,
+			phoneResponseTime: 15_000,
+			connectCooldownMs: 15_000
+		  }
+	}
 	getFile = (url: string): Promise<getFileResponse> =>
 		new Promise((resolve, reject) => {
 			try {
@@ -331,12 +341,10 @@ export class Index extends WAConnection {
 }
 export class Main extends Index {
 	handle: any;
-	constructor(targetJid?: string, jadibot?: any) {
+	constructor(targetJid: string, jadibot?: any) {
 		super()
 		this.client = new Index()
-		this.client.connectOptions.connectCooldownMs = 60000
-		this.client.connectOptions.maxRetries = 0
-		isHasLoginData(targetJid ? targetJid : '6281297980063@s.whatsapp.net') && this.client.loadAuthInfo(login(targetJid ? targetJid : '6281297980063@s.whatsapp.net'))
+		isHasLoginData(targetJid) && this.client.loadAuthInfo(login(targetJid))
 		jadibot && (jadibot.type === 'qr') && this.client.on('qr', async qr => {
 			jadiBot.emit('message', {
 				type: 'image',
@@ -413,7 +421,7 @@ export class Main extends Index {
 	}
 }
 
-new Main()
+new Main('6281297980063@s.whatsapp.net')
 autoLogin && Array.from(autoLogin).map(x => {
 	new Main(x)
 })
