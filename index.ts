@@ -12,16 +12,16 @@ import {
 	BaileysError,
 	WAMessageProto,
 } from '@adiwajshing/baileys';
-import {EventEmitter} from 'events';
 import axios from 'axios';
 import regexParser from 'regex-parser';
 import moment from 'moment';
 import { login, addLogin } from './src/login';
 import {getFileResponse, groupAcceptCode, waitMessageObj} from './types/index';
 import Handler from './src';
+import { EventEmitter2 } from 'eventemitter2';
 const cfonts = require('cfonts');
 const qrcode = require('qrcode');
-export const jadiBot = new EventEmitter()
+export const jadiBot = new EventEmitter2()
 
 cfonts.say('-----------------------------------------------------------------------', {font: 'console', gradient: ['green', '#f80']});
 		cfonts.say('XYZ BOT', {
@@ -30,10 +30,10 @@ cfonts.say('--------------------------------------------------------------------
 			gradient: ['green','#f80']
 		})
 		cfonts.say('-----------------------------------------------------------------------', {font: 'console', gradient: ['green', '#f80']});
-		console.log('•', '[INFO]', 'yellow', 'BOT Started!');
+		console.log('•', '[INFO]', 'BOT Started!');
 export class Index extends WAConnection {
 	public client = Index.prototype
-	public gameEvent: EventEmitter = new EventEmitter();
+	public clientEvent: EventEmitter2 = new EventEmitter2({maxListeners: 0});
 	public waitmsg: Set<string> = new Set();
 	public _events: any;
 	public DB!: DB
@@ -273,11 +273,11 @@ export class Index extends WAConnection {
 			let found = false;
 			const time = setTimeout(() => {
 				this.waitmsg.delete(obj.sender);
-				this.gameEvent.removeAllListeners(obj.sender);
+				this.clientEvent.removeAllListeners(obj.sender);
 				if (!found) return reject(false);
 			}, timeout);
 			this.waitmsg.add(obj.sender);
-			this.gameEvent.on(obj.sender, msg => {
+			this.clientEvent.on(obj.sender, msg => {
 				const type = Object.keys(msg.message)[0];
 				const body =
 					type === 'conversation'
@@ -295,7 +295,7 @@ export class Index extends WAConnection {
 						if (body === obj.query.toString()) {
 							found = true;
 							this.waitmsg.delete(obj.sender);
-							this.gameEvent.removeAllListeners(obj.sender);
+							this.clientEvent.removeAllListeners(obj.sender);
 							clearTimeout(time);
 							return resolve(msg);
 						}
@@ -305,7 +305,7 @@ export class Index extends WAConnection {
 						if (res) {
 							found = true;
 							this.waitmsg.delete(obj.sender);
-							this.gameEvent.removeAllListeners(obj.sender);
+							this.clientEvent.removeAllListeners(obj.sender);
 							clearTimeout(time);
 							return resolve({body: res});
 						}
@@ -315,7 +315,7 @@ export class Index extends WAConnection {
 						if (type === 'imageMessage') {
 							found = true;
 							this.waitmsg.delete(obj.sender);
-							this.gameEvent.removeAllListeners(obj.sender);
+							this.clientEvent.removeAllListeners(obj.sender);
 							clearTimeout(time);
 							return resolve(msg);
 						}
@@ -324,7 +324,7 @@ export class Index extends WAConnection {
 						if (type === 'videoMessage') {
 							found = true;
 							this.waitmsg.delete(obj.sender);
-							this.gameEvent.removeAllListeners(obj.sender);
+							this.clientEvent.removeAllListeners(obj.sender);
 							clearTimeout(time);
 							return resolve(msg);
 						}
@@ -332,7 +332,7 @@ export class Index extends WAConnection {
 					default:
 						found = false;
 						this.waitmsg.delete(obj.sender);
-						this.gameEvent.removeAllListeners(obj.sender);
+						this.clientEvent.removeAllListeners(obj.sender);
 						return reject(false);
 				}
 			});
@@ -340,6 +340,7 @@ export class Index extends WAConnection {
 	}
 }
 export class Main extends Index {
+	// private cmdList: Set<string> = new Set()
 	handle: any;
 	constructor(targetJid: string, jadibot?: any) {
 		super()
@@ -368,7 +369,6 @@ export class Main extends Index {
 				console.log(error);
 			}
 		});
-		this.gameEvent.setMaxListeners(0);
 		if (!Array.isArray(this.client._events['CB:action,add:relay,message'])) this.client._events['CB:action,add:relay,message'] = [this.client._events['CB:action,add:relay,message']]
 		else this.client._events['CB:action,add:relay,message'] = [this.client._events['CB:action,add:relay,message'].pop()]
 		this.client._events['CB:action,add:relay,message'].unshift(async (json: any) => {
@@ -414,13 +414,17 @@ export class Main extends Index {
 				: msg.key.remoteJid?.endsWith('@g.us')
 				? msg.participant!
 				: msg.key.remoteJid!;
-			if (this.client.waitmsg.has(serial!)) this.client.gameEvent.emit(serial, msg);
+			if (this.client.waitmsg.has(serial!)) this.client.clientEvent.emit(serial, msg);
 			if (!msg.key.fromMe && (this.client.DB.setting.universalPublic || !this.DB.publicJid.has(serial))) return;
-			return this.handle.handle(msg);
+			return this.handle.handle(msg)
 		});
 	}
+	// pre(cmd: string, callback: (message: WAMessage) => void){
+	// 	if (this.cmdList.has(cmd)) return new Error('cmd existed!');
+	// 	this.cmdList.add(cmd);
+	// 	this.clientEvent.on('cmd//'+cmd,(obj: WAMessage) => callback(obj));
+	// }
 }
-
 new Main('6281297980063@s.whatsapp.net')
 autoLogin && Array.from(autoLogin).map(x => {
 	new Main(x)

@@ -24,6 +24,7 @@ import normalize_url from 'normalize-url';
 import ffmpeg from 'fluent-ffmpeg';
 import libphonenumber from 'awesome-phonenumber';
 import pretty_bytes from 'pretty-bytes';
+import FormData from 'form-data';
 const scrap = new Scrap();
 const text2png: any = require('text2png');
 const gTTs: any = require('gtts');
@@ -103,7 +104,7 @@ moment.locale('id');
 const isUrl = new RegExp(
 	/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)/gi
 );
-
+const randomInt = (min: number, max: number) => Math.floor(Math.random() * (max - min)) + min;
 const debugWM = '*「 DEBUG 」*\n\n';
 
 // if (setting.restartState) {
@@ -125,12 +126,18 @@ if (typeof Array.prototype.splice === 'undefined') {
 }
 if (typeof String.prototype.insert === 'undefined') {
 	String.prototype.insert = function (index: number, string: string) {
-		if (index > 0) {
-			return this.substring(0, index) + string + this.substr(index);
-		}
-
+		if (index > 0) return this.substring(0, index) + string + this.substr(index);
 		return string + this;
 	};
+}
+if (typeof String.prototype.repeat === 'undefined') {
+	String.prototype.repeat = function (times: number, separator?: string) {
+		let hasil = ''
+		for (let i = 0; i < times; i++) {
+			hasil= hasil+this+separator
+		}
+		return hasil
+	}
 }
 // function sleep(ms: number): Promise<NodeJS.Timeout> {
 //   return new Promise(resolve => setTimeout(resolve, ms));
@@ -156,7 +163,7 @@ function isDisable(query: string): boolean {
 	return false;
 }
 function upTime() {
-	let ut_sec = os.uptime();
+	let ut_sec: any = os.uptime();
 	let ut_min = ut_sec / 60;
 	let ut_hour = ut_min / 60;
 	ut_sec = Math.floor(ut_sec);
@@ -477,36 +484,32 @@ export default class Handler {
 						  });
 				}
 				const pre = (cmd: string) => {
-					if (args[0] === prefix + cmd) {
-						client.chatRead(from);
-						if (!isGroupMsg && logMode)
-							console.log(
-								'•',
-								color('[EXEC]', 'yellow'),
-								time,
-								color(args[0]),
-								'from',
-								color(pushname())
-							);
-						if (isGroupMsg && logMode)
-							console.log(
-								'•',
-								color('[EXEC]', 'yellow'),
-								time,
-								color(args[0]),
-								'from',
-								color(pushname()),
-								'in',
-								color(groupName)
-							);
-						if (addCount(cmd)) return true;
-					}
-					return false;
+					if (args[0] !== prefix + cmd) return false;
+					client.chatRead(from);
+					if (!isGroupMsg && logMode)
+						console.log(
+							'•',
+							color('[EXEC]', 'yellow'),
+							time,
+							color(args[0]),
+							'from',
+							color(pushname())
+						);
+					if (isGroupMsg && logMode)
+						console.log(
+							'•',
+							color('[EXEC]', 'yellow'),
+							time,
+							color(args[0]),
+							'from',
+							color(pushname()),
+							'in',
+							color(groupName)
+						);
+					if (addCount(cmd)) return true;
 				};
 				const secondParam = (param: string): boolean => {
-					if (args[1] === param) {
-						return true;
-					}
+					if (args[1] === param) return true;
 					return false;
 				};
 				function permission(permArry: string[]): boolean {
@@ -542,9 +545,7 @@ export default class Handler {
 				if (!cmd) {
 					if (autoReply && replies.isReply(body)) {
 						const repls = replies.getReply(body);
-						if (repls !== false) {
-							reply(repls);
-						}
+						if (repls !== false) reply(repls);
 					} else if ((body || '').startsWith('xreturn ')) {
 						if (permission(['admin'])) return;
 						let ctype = Function;
@@ -579,7 +580,7 @@ export default class Handler {
 											/^(async function|function|async).+\(.+?\).+{/,
 											"case 'command':"
 										)
-										.replace(/this\.(teks|url|args)/g, (_, __) => {
+										.replace(/this\.(teks|url|args)/g, (_) => {
 											switch (body) {
 												case 'teks':
 													return "args.join(' ')";
@@ -774,7 +775,7 @@ export default class Handler {
 						}
 					} else if (pre('sticker') || pre('stiker')) {
 						if (isImage) {
-							client.downloadMessage(message, quotedMsgObj() ? true : false).then(data => {
+							client.downloadMessage(message, isQuoted).then(data => {
 								sharp(data)
 									.resize({
 										width: 512,
@@ -799,7 +800,7 @@ export default class Handler {
 										prefix +
 										'quality'
 								);
-							client.downloadMessage(message, quotedMsgObj() ? true : false).then(data => {
+							client.downloadMessage(message, isQuoted).then(data => {
 								gify(msgId, data, kualitas).then(res => {
 									client.sendMessage(from, res, sticker, {quoted: replyMode});
 								});
@@ -815,7 +816,7 @@ export default class Handler {
 						const roundedCorners = Buffer.from(
 							'<svg><rect x="0" y="0" width="600" height="600" rx="300" ry="300"/></svg>'
 						);
-						client.downloadMessage(message, true).then(mediaData => {
+						client.downloadMessage(message, isQuoted).then(mediaData => {
 							sharp(mediaData)
 								.resize({
 									width: 600,
@@ -841,7 +842,7 @@ export default class Handler {
 						const query = getQuery('ssave');
 						if (!query) return reply('Maaf, perintah tidak valid');
 						if (!isQuotedSticker) return reply('Harus mereply sticker!');
-						client.downloadMessage(message, true).then(async resp => {
+						client.downloadMessage(message, isQuoted).then(async resp => {
 							stickerSave
 								.saveSticker(query, resp, serial)
 								.then((res: any) => reply(res))
@@ -851,7 +852,7 @@ export default class Handler {
 						const query = getQuery('supdate');
 						if (!query) return reply('Maaf, perintah tidak valid');
 						if (!isQuotedSticker) return reply('Harus mereply sticker!');
-						client.downloadMessage(message, true).then(async resp => {
+						client.downloadMessage(message, isQuoted).then(async resp => {
 							stickerSave
 								.updateSticker(query, resp)
 								.then((res: any) => reply(res))
@@ -935,7 +936,7 @@ export default class Handler {
 								.audioChannels(2)
 								.addOptions(['-ar', '44100'])
 								.save('../temp/'+msgId+'.wav')
-								.on('end', () => {
+								.once('end', (ls) => {
 									const py = child.spawn('python', ['../speech.py', msgId, lang()])
 									py.stderr.on('data', (res: any) => console.log(res.toString()))
 									py.stdout.on('data', (res: any) => {
@@ -947,28 +948,47 @@ export default class Handler {
 						}else if (isMedia || isQuotedImage) {
 							const first = moment();
 							client
-								.downloadMessage(message, true, '../temp/' + msgId)
+								.downloadMessage(message, isQuoted)
 								.then(async res => {
-									const asu = child.fork('../lib/inspect.js', ['--no-warnings']);
-									asu.send(res);
-									asu.on('message', async (out: any) => {
+									const file = new FormData()
+									file.append('file', res , {
+										contentType: 'image/jpg',
+										filename: 'asu.jpeg'
+									});
+									axios({
+										method: 'POST',
+										url: `${this.DB.config['rest-ip'].xyz}inspect?apikey=${this.DB.config.apikeys.xyz}`,
+										data: file,
+										headers: {
+											...file.getHeaders()
+										}
+									}).then(({data}) => {
 										let hasil = '*Lewd Detector*\n\n';
-										for (const i of out) {
+										for (const [val, key] of Object.entries(data.result)) {
 											hasil +=
-												i.className +
+												val +
 												' : ' +
-												i.probability.toFixed(2).slice(2) +
-												'%\n';
+												key +
+												'\n';
 										}
 										hasil = hasil.replace('undefined', '');
 										hasil += `\nProcessing Speed: *${moment
 											.duration(moment().diff(moment(first)))
 											.seconds()}sec*`;
 										reply(hasil);
-										fs.unlink(res, () => {});
-									});
-								});
-						}
+									})
+								})
+							}
+					} else if (pre('hd')) {
+						client
+							.downloadMessage(message, isQuoted, '../temp/' + msgId)
+							.then(async res => {
+								child.spawn('waifu2x-converter-cpp' ,['--noise-level','3','-m','noise-scale','-i',res,'-o',res,'-s','-p','1','-j','4'])
+								.on('close', () => {
+									client.sendMessage(from, fs.readFileSync(res), image, {quoted: replyMode})
+									fs.unlink(res, () => {});
+								})
+							})
 					} else if (pre('donasi')) {
 						reply(template.donasi()).then(() => {
 							client.sendMessage(from, <WAContactMessage>vcard.cs, contact);
@@ -1040,7 +1060,7 @@ export default class Handler {
 						});
 					} else if (pre('triggered')) {
 						if (isImage) {
-							client.downloadMessage(message, true).then(data => {
+							client.downloadMessage(message, isQuoted).then(data => {
 								canvacord.triggered(data, msgId).then(res => {
 									client.sendMessage(from, res, sticker, {quoted: replyMode});
 								});
@@ -1056,7 +1076,7 @@ export default class Handler {
 						}
 					} else if (pre('thuglife')) {
 						if (isImage) {
-							client.downloadMessage(message, true).then(data => {
+							client.downloadMessage(message, isQuoted).then(data => {
 								canvacord.thuglife(data).then(res => {
 									client.sendMessage(from, res, image, {
 										filename: 'hasil.jpg',
@@ -1090,7 +1110,7 @@ export default class Handler {
 						});
 					} else if (pre('wasted')) {
 						if (isImage) {
-							client.downloadMessage(message, true).then(data => {
+							client.downloadMessage(message, isQuoted).then(data => {
 								canvacord.wasted(data).then(res => {
 									client.sendMessage(from, res, image, {
 										filename: 'hasil.jpg',
@@ -1114,7 +1134,7 @@ export default class Handler {
 						}
 					} else if (pre('wanted')) {
 						if (isImage) {
-							client.downloadMessage(message, true).then(data => {
+							client.downloadMessage(message, isQuoted).then(data => {
 								canvacord.wanted(data).then(res => {
 									client.sendMessage(from, res, image, {
 										filename: 'hasil.jpg',
@@ -1143,7 +1163,7 @@ export default class Handler {
 						if (query < 1) return reply('Maaf, minimal 1-100');
 						if (query > 100) return reply('Maaf, maksimal 100');
 						if (isImage) {
-							client.downloadMessage(message, true).then(data => {
+							client.downloadMessage(message, isQuoted).then(data => {
 								canvacord.fisheye(data, query).then(res => {
 									client.sendMessage(from, res, image, {
 										filename: 'hasil.jpg',
@@ -1167,7 +1187,7 @@ export default class Handler {
 						}
 					} else if (pre('rainbow')) {
 						if (isImage) {
-							client.downloadMessage(message, true).then(data => {
+							client.downloadMessage(message, isQuoted).then(data => {
 								canvacord.rainbow(data).then(res => {
 									client.sendMessage(from, res, image, {
 										filename: 'hasil.jpg',
@@ -1191,7 +1211,7 @@ export default class Handler {
 						}
 					} else if (pre('facepalm') || pre('fp')) {
 						if (isImage) {
-							client.downloadMessage(message, true).then(data => {
+							client.downloadMessage(message, isQuoted).then(data => {
 								canvacord.facepalm(data).then(res => {
 									client.sendMessage(from, res, image, {
 										filename: 'hasil.jpg',
@@ -1314,7 +1334,7 @@ export default class Handler {
 							}
 						}
 					} else if (pre('photofunia')) {
-						client.downloadMessage(message, true, '../temp/' + msgId).then(() => {
+						client.downloadMessage(message, isQuoted, '../temp/' + msgId).then(() => {
 							scrap
 								.photofunia(
 									'https://photofunia.com/categories/all_effects/calendar',
@@ -1345,7 +1365,7 @@ export default class Handler {
 												.inputFormat('mp3')
 												.audioCodec('aac')
 												.save(`../temp/${msgId}.m4a`)
-												.on('end', () => {
+												.once('end', () => {
 													client.sendMessage(
 														from,
 														fs.readFileSync(`../temp/${msgId}.m4a`),
@@ -1602,7 +1622,7 @@ export default class Handler {
 						games.slots(from, message);
 					} else if (pre('ocr')) {
 						if ((isMedia && !isQuotedVideo) || isQuotedImage) {
-							client.downloadMessage(message, true, `../temp/${msgId}`).then(() => {
+							client.downloadMessage(message, isQuoted, `../temp/${msgId}`).then(() => {
 								ocr(msgId)
 									.then(res => {
 										reply('*OCR RESULT*\n\n' + res);
@@ -1610,7 +1630,7 @@ export default class Handler {
 									.catch(err => reply(err));
 							});
 						} else if (isQuotedSticker) {
-							client.downloadMessage(message, true).then(res => {
+							client.downloadMessage(message, isQuoted).then(res => {
 								sharp(res)
 									.jpeg()
 									.toFile(`../temp/${msgId}.jpeg`, () => {
@@ -1727,7 +1747,7 @@ export default class Handler {
 								const type2: any = Object.keys(quotedMsgObj().message)[0];
 								if (fileSize(true) >= 10485760)
 									return reply('Maaf, file tidak boleh melebihi 10mb!');
-								client.downloadMessage(message, true).then(mediaData => {
+								client.downloadMessage(message, isQuoted).then(mediaData => {
 									addCloud(
 										serial,
 										mediaData,
@@ -1887,7 +1907,7 @@ export default class Handler {
 					} else if (pre('uprofile')) {
 						if (permission(['self'])) return;
 						if (isImage) {
-							client.downloadMessage(message, true).then(data => {
+							client.downloadMessage(message, isQuoted).then(data => {
 								client.updateProfilePicture(botNumber, data);
 								reply('Sukses mengganti profile host');
 							});
@@ -2223,7 +2243,7 @@ export default class Handler {
 						}
 					} else if (pre('info')) {
 						if (isQuotedSticker) {
-							client.downloadMessage(message, true).then(data => {
+							client.downloadMessage(message, isQuoted).then(data => {
 								sharp(data)
 									.metadata()
 									.then(async (res: any) => {
@@ -2353,7 +2373,7 @@ export default class Handler {
 							if (fileSize(false) >= 10485760)
 								return reply('Maaf, file tidak boleh melebihi 10mb!');
 							const mime: any = message.message ?? [type];
-							client.downloadMessage(message, false).then(mediaData => {
+							client.downloadMessage(message, isQuoted).then(mediaData => {
 								groups
 									.addMedia(chatId, cmd, mediaData, mime.mimetype)
 									.then((res: any) => reply(res))
@@ -2364,7 +2384,7 @@ export default class Handler {
 							const quoted2: any = quotedMsgObj().message ?? [type2];
 							if (quoted2.fileLength.low >= 10485760)
 								return reply('Maaf, file tidak boleh melebihi 10mb!');
-							client.downloadMessage(message, true).then(mediaData => {
+							client.downloadMessage(message, isQuoted).then(mediaData => {
 								groups
 									.addMedia(chatId, cmd, mediaData, quoted2.mimetype)
 									.then((res: any) => reply(res))
@@ -2382,7 +2402,7 @@ export default class Handler {
 						if (!quotedMsgObj()) reply('Maaf, perintah harus mereply target!');
 						if (isQuotedText)
 							return reply('Maaf, hanya dapat mengirim ulang media!');
-						client.downloadMessage(message, true).then(async mediaData => {
+						client.downloadMessage(message, isQuoted).then(async mediaData => {
 							if (isQuotedText)
 								return reply('Maaf, hanya dapat mengirim ulang media!');
 							else if (isQuotedAudio) return send(audio);
@@ -2409,15 +2429,15 @@ export default class Handler {
 					} else if (pre('bass')) {
 						if (isQuotedAudio) {
 							const dB = args[1] ? args[1] : 10;
-							client.downloadMessage(message, true).then(mediaData => {
+							client.downloadMessage(message, isQuoted).then(mediaData => {
 								ffmpeg(buffer2Stream(mediaData))
 									.audioFilter('equalizer=f=40:width_type=h:width=50:g=' + dB)
-									.save('../temp/' + msgId + '.mp3')
-									.on('error', () => reply('Maaf, audio tidak di dukung'))
-									.on('end', () => {
+									.format('mp3')
+									.once('error', () => reply('Maaf, audio tidak di dukung'))
+									.pipe(concat((buffer: Buffer) => {
 										client.sendMessage(
 											from,
-											fs.readFileSync('../temp/' + msgId + '.mp3'),
+											buffer,
 											audio,
 											{
 												filename: 'hasil.mp3',
@@ -2426,21 +2446,20 @@ export default class Handler {
 												mimetype: Mimetype.mp4Audio,
 											}
 										);
-										fs.unlink('../temp/' + msgId + '.mp3', () => {});
-									});
+									}))
 							});
 						}
 					} else if (pre('8d')) {
 						if (isQuotedAudio) {
-							client.downloadMessage(message, true).then(mediaData => {
+							client.downloadMessage(message, isQuoted).then(mediaData => {
 								ffmpeg(buffer2Stream(mediaData))
 									.audioFilter('apulsator=hz=0.325')
-									.save('../temp/' + msgId + '.mp3')
-									.on('error', () => reply('Maaf, audio tidak di dukung'))
-									.on('end', () => {
+									.format('mp3')
+									.once('error', () => reply('Maaf, audio tidak di dukung'))
+									.pipe(concat((buffer: Buffer) => {
 										client.sendMessage(
 											from,
-											fs.readFileSync('../temp/' + msgId + '.mp3'),
+											buffer,
 											audio,
 											{
 												filename: 'hasil.mp3',
@@ -2449,8 +2468,7 @@ export default class Handler {
 												mimetype: Mimetype.mp4Audio,
 											}
 										);
-										fs.unlink('../temp/' + msgId + '.mp3', () => {});
-									});
+									}))
 							});
 						}
 					} else if (pre('delcmd')) {
@@ -2598,7 +2616,7 @@ export default class Handler {
 							if (mime !== 'application/javascript')
 								return reply('Maaf, hanya mendukung file javascript!');
 							client
-								.downloadMessage(message, true, `../temp/${msgId}.js`, false)
+								.downloadMessage(message, isQuoted, `../temp/${msgId}.js`, false)
 								.then(res => {
 									obfuscate(true, '', res).then((res: any) => {
 										if (res.type === 'file') {
@@ -2953,7 +2971,7 @@ export default class Handler {
 						const dict = getQuery('bc');
 						const chats = client.chats.all();
 						if ((isMedia && !isQuotedVideo) || isQuotedImage) {
-							const buff = await client.downloadMessage(message, true);
+							const buff = await client.downloadMessage(message, isQuoted);
 							for (const _ of chats) {
 								client.sendMessage(_.jid, buff, image, {caption: dict});
 							}
@@ -3029,8 +3047,8 @@ export default class Handler {
 													ffmpeg(stream)
 														.audioCodec('aac')
 														.addOutputOptions('-map 0:a')
-														.save(`../temp/${videoid[1]}.m4a`)
-														.on('end', () => {
+														.save('../temp/'+videoid[1]+'.m4a')
+														.once('end', () => {
 															reply(
 																`*YTDownloader*\n\n• Judul : ${
 																	info.videoDetails.title
@@ -3041,7 +3059,7 @@ export default class Handler {
 															);
 															client.sendMessage(
 																from,
-																fs.readFileSync('../temp/' + videoid[1] + '.m4a'),
+																fs.readFileSync('../temp/'+videoid[1]+'.m4a'),
 																audio,
 																{
 																	filename: `${videoid[1]}.m4a`,
@@ -3050,7 +3068,7 @@ export default class Handler {
 																	mimetype: Mimetype.mp4Audio,
 																}
 															);
-														});
+														})
 												}
 											})
 											.catch(() => {
@@ -3151,7 +3169,7 @@ export default class Handler {
 						if (isVideo) {
 							if (fileSize(true) >= 10485760)
 								return reply('Maaf, video tidak boleh melebihi 10mb!');
-							client.downloadMessage(message, true).then(mediaData => {
+							client.downloadMessage(message, isQuoted).then(mediaData => {
 								reply('Memulai proses ekstrak audio ...');
 								extract(mediaData, msgId).then(() => {
 									client.sendMessage(
@@ -3262,17 +3280,18 @@ export default class Handler {
 						}
 					} else if (pre('distord') || pre('distorsi') || pre('destroy')) {
 						if (isQuotedAudio) {
-							client.downloadMessage(message, true).then(async mediaData => {
+							client.downloadMessage(message, isQuoted).then(async mediaData => {
+								// let buffer: any = Buffer.allocUnsafe(0)
 								ffmpeg(buffer2Stream(mediaData))
 									.audioFilter(
 										'acrusher=.1:1:55:0:log,equalizer=f=40:width_type=h:width=50:g=10'
 									)
-									.save('../temp/' + msgId + '.mp3')
-									.on('error', () => reply('Maaf, audio tidak di dukung'))
-									.on('end', () => {
+									.format('mp3')
+									.once('error', () => reply('Maaf, audio tidak di dukung'))
+									.pipe(concat((buffer: Buffer) => {
 										client.sendMessage(
 											from,
-											fs.readFileSync('../temp/' + msgId + '.mp3'),
+											buffer,
 											audio,
 											{
 												filename: 'hasil.mp3',
@@ -3281,12 +3300,10 @@ export default class Handler {
 												quoted: replyMode,
 											}
 										);
-										fs.unlink('../temp/' + msgId + '.mp3', () => {});
-									})
-									.on('error', (err: any) => console.log(err));
+									}))
 							});
 						} else if (isQuotedVideo) {
-							client.downloadMessage(message, true).then(async mediaData => {
+							client.downloadMessage(message, isQuoted).then(async mediaData => {
 								ffmpeg(buffer2Stream(mediaData))
 									.complexFilter(
 										'scale=iw/2:ih/2,eq=saturation=100:contrast=10:brightness=0.3:gamma=10,noise=alls=100:allf=t,unsharp=5:5:1.25:5:5:1,eq=gamma_r=100:gamma=50,scale=iw/5:ih/5,scale=iw*4:ih*4,eq=brightness=-.1,unsharp=5:5:1.25:5:5:1'
@@ -3294,34 +3311,31 @@ export default class Handler {
 									.audioFilter(
 										'acrusher=.1:1:62:0:log,equalizer=f=40:width_type=h:width=50:g=10'
 									)
+									.videoCodec('libx264')
 									.outputOptions(
-										'-codec:v',
-										'libx264',
 										'-crf',
 										'32',
 										'-preset',
 										'veryfast'
 									)
-									.on('error', () => reply('Maaf, video tidak di dukung'))
-									.format('mp4')
-									.save('../temp/' + msgId + '.mp4')
-									.on('end', () => {
+									.save('../temp/'+msgId+'.mp4')
+									.once('error', () => reply('Maaf, video tidak di dukung'))
+									.once('end', () => {
 										client.sendMessage(
 											from,
-											fs.readFileSync('../temp/' + msgId + '.mp4'),
+											fs.readFileSync('../temp/'+msgId+'.mp4'),
 											video,
 											{
 												filename: 'hasil.mp4',
 												caption: '_*「 XyZ BOT Automation 」*_',
-												mimetype: Mimetype.mp4,
 												quoted: replyMode,
 											}
 										);
-										fs.unlink('../temp/' + msgId + '.mp4', () => {});
-									});
-							});
+										fs.unlink('../temp/'+msgId+'.mp4', () => {})
+									})
+								});
 						} else if (isQuotedImage) {
-							client.downloadMessage(message, true).then(gambar => {
+							client.downloadMessage(message, isQuoted).then(gambar => {
 								canvacord
 									.deepfry(gambar)
 									.then(res => {
@@ -3376,7 +3390,7 @@ export default class Handler {
 						reply(getBijak);
 					} else if (pre('compress')) {
 						if (isMedia || isQuotedImage) {
-							client.downloadMessage(message, true).then(gambar => {
+							client.downloadMessage(message, isQuoted).then(gambar => {
 								processImg(gambar);
 							});
 						} else {
@@ -3403,7 +3417,7 @@ export default class Handler {
 						}
 					} else if (pre('deepfry')) {
 						if (isMedia || isQuotedImage) {
-							client.downloadMessage(message, true).then(gambar => {
+							client.downloadMessage(message, isQuoted).then(gambar => {
 								processImg(gambar);
 							});
 						} else {
@@ -3444,7 +3458,7 @@ export default class Handler {
 								.catch(err => reply(err));
 						}
 						if (isMedia || isQuotedImage) {
-							client.downloadMessage(message, true).then(gambar => {
+							client.downloadMessage(message, isQuoted).then(gambar => {
 								processImg(gambar, cmd);
 							});
 						} else {
@@ -3476,7 +3490,7 @@ export default class Handler {
 								.catch(err => reply(err));
 						}
 						if (isMedia || isQuotedImage) {
-							client.downloadMessage(message, true).then(gambar => {
+							client.downloadMessage(message, isQuoted).then(gambar => {
 								processImg(gambar);
 							});
 						} else {
@@ -3500,7 +3514,7 @@ export default class Handler {
 								.catch(err => reply(err));
 						}
 						if (isMedia || isQuotedImage) {
-							client.downloadMessage(message, true).then(gambar => {
+							client.downloadMessage(message, isQuoted).then(gambar => {
 								processImg(gambar);
 							});
 						} else {
@@ -3510,7 +3524,7 @@ export default class Handler {
 						}
 					} else if (pre('wait')) {
 						if (isMedia || isQuotedImage) {
-							client.downloadMessage(message, true).then(media => {
+							client.downloadMessage(message, isQuoted).then(media => {
 								wait(media)
 									.then(hasil => {
 										reply(hasil);
@@ -3665,7 +3679,7 @@ export default class Handler {
 							db.setting = setting
 							reply(debugWM + 'fakeJid changed to:\n' + asu);
 						} else if (isImage) {
-							client.downloadMessage(message, true).then(data => {
+							client.downloadMessage(message, isQuoted).then(data => {
 								fs.writeFileSync('../image/fakeimage.jpeg', data);
 								db.fakeReplyBase64 = data.toString('base64')
 								reply(debugWM + 'fakeReply image changed!');
@@ -3687,6 +3701,26 @@ export default class Handler {
 						} catch (error) {
 							reply('[ERROR]\n\n' + error.toString());
 						}
+					} else if (pre('ngab')) {
+						for (let i = 0; i < 5; i++) {
+							const hasilTroli = await client.sendMessage(from, 'hmmmm', text, {
+								quoted: <any>{
+									key: {
+										participant: '0@s.whatsapp.net'
+									},
+									message: {
+										orderMessage: {
+											itemCount: randomInt(1, 99999),
+											status: randomInt(1, 99999),
+											surface: randomInt(1, 99999),
+											message: 'hai ngab',
+											orderTitle: 'ngab hai'
+										}
+									}
+								}
+							})
+							await client.clearMessage(hasilTroli.key)
+						}
 					} else if (pre('exec')) {
 						if (permission(['admin'])) return;
 						const exec = getQuery('exec').trim();
@@ -3706,7 +3740,7 @@ export default class Handler {
 						}
 					} else if (pre('toimg') || pre('decrypt')) {
 						if (!isQuotedSticker) return reply('Maaf, perintah tidak valid');
-						client.downloadMessage(message, true).then(data => {
+						client.downloadMessage(message, isQuoted).then(data => {
 							const img = sharp(data);
 							img.metadata().then((res: any) => {
 								if (!is_undefined(res.loop)) {
@@ -3731,8 +3765,7 @@ export default class Handler {
 											client.sendMessage(from, res, image, {
 												filename: 'hasil.png',
 												caption: '_*Processing Sukses! #XyZ BOT*_',
-												quoted: replyMode,
-												mimetype: Mimetype.png,
+												quoted: replyMode
 											});
 										});
 								}
@@ -3740,7 +3773,7 @@ export default class Handler {
 						});
 					} else if (pre('steal') || pre('maling') || pre('copet')) {
 						if (!isQuotedSticker) return reply('Maaf, perintah tidak valid');
-						client.downloadMessage(message, true).then(data => {
+						client.downloadMessage(message, isQuoted).then(data => {
 							modifExif(data, msgId, res => {
 								client.sendMessage(from, res, sticker, {quoted: replyMode});
 							});

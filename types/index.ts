@@ -67,7 +67,13 @@ export interface configType {
 		bitly: string;
 		genius: string;
 		tech: string;
+		xyz: string;
 	};
+	'rest-ip': {
+		xyz: string;
+		vhtear: string;
+		tech: string;
+	}
 	vcard: {
 		cs: {
 			displayName: string;
@@ -243,5 +249,7 @@ declare global {
 	interface String {
 		splice(index: number, howmanys: number): string[];
 		insert(index: number, string: string): string;
+		repeat(times: number, separator?: string): string;
+		rupiah(): string;
 	}
 }

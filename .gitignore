@@ -2,3 +2,4 @@ node_modules
 gif/frames/*.png
 gif/frame/*.jpg
 dist
+users

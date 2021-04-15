@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-async-promise-executor */
+import FormData from 'form-data';
 import fetch from 'node-fetch';
 import moment from 'moment';
 import axios from 'axios';
@@ -20,6 +21,21 @@ const {JSDOM} = require('jsdom');
 const momentDur = require('moment-duration-format');
 momentDur(moment);
 
+if (typeof String.prototype.rupiah === 'undefined'){
+	String.prototype.rupiah = function () {
+		const number_string = this.replace(/[^,\d]/g, '').toString()
+		const split = number_string.split(',')
+		const sisa = split[0].length % 3
+		let rupiah     		= split[0].substr(0, sisa)
+		const ribuan     		= split[0].substr(sisa).match(/\d{3}/gi);
+		if(ribuan){
+			const separator = sisa ? '.' : '';
+			rupiah += separator + ribuan.join('.');
+		}
+		rupiah = split[1] !== undefined ? rupiah + ',' + split[1] : rupiah;
+		return 'Rp' + rupiah
+	}
+}
 export default class Function {
 	private setting: settingType;
 	private config: configType;
@@ -278,6 +294,26 @@ export default class Function {
 			if (!response.ok) reject('Gambar tidak valid!');
 			return resolve(await response.buffer());
 		});
+	shopee = (str: string, limit = 10): Promise<any> => new Promise(async (resolve) => {
+		const res = await fetch(`https://shopee.co.id/api/v4/search/search_items?by=relevancy&keyword=${str}&limit=${limit}&newest=0&order=desc&page_type=search&version=2`)
+		const json = await res.json();
+		return resolve(await Promise.all(json.items.map(async (el: any) => {
+			const res2 = await fetch(`https://shopee.co.id/api/v2/item/get?itemid=${el.item_basic.itemid}&shopid=${el.item_basic.shopid}`)
+			const resp = await res2.json();
+			return Promise.resolve(
+				{
+					name:  resp.item.name,
+					image: ' https://cf.shopee.co.id/file/'+resp.item.image,
+					stock: resp.item.stock,
+					sold: resp.item.sold,
+					brand: resp.item.brand,
+					price: resp.item.price,
+					location: resp.item.shop_location,
+					description: resp.item.description
+				}
+			)
+		})))
+	})
 	ig = (url: string): Promise<any> =>
 		new Promise(async (resolve, reject) => {
 			const response = await fetch(
@@ -521,6 +557,26 @@ export default class Function {
 				return reject('Sedang Error');
 			}
 		});
+	inspects = (buffer: Buffer): Promise<any> => {
+		return new Promise(async (resolve, reject) => {
+			const file = new FormData()
+			file.append('file', buffer , {
+				contentType: 'image/jpg',
+				filename: 'asu.jpeg'
+			});
+			axios({
+				method: 'POST',
+				url: `${this.DB.config['rest-ip'].xyz}inspect?apikey=${this.DB.config.apikeys.xyz}`,
+				data: file,
+				headers: {
+					...file.getHeaders()
+				}
+			}).then(({data}) => {
+				console.log(data);
+				resolve(data.result)
+			})
+		})
+	}
 	ytv = (url: string): any =>
 		new Promise((resolve, reject) => {
 			const ytId: any = url.match(

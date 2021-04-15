@@ -15,13 +15,13 @@ function modifExif(id: string, callback: (Buff: Buffer) => void) {
   spawn('webpmux', [
     '-set',
     'exif',
-    './src/data.exif',
-    './temp/' + id + '.webp',
+    '../src/data.exif',
+    '../temp/' + id + '.webp',
     '-o',
-    './temp/' + id + '.webp',
+    '../temp/' + id + '.webp',
   ]).on('exit', () => {
-    callback(fs.readFileSync('./temp/' + id + '.webp'));
-    fs.unlink('./temp/' + id + '.webp').then(() => {});
+    callback(fs.readFileSync('../temp/' + id + '.webp'));
+    fs.unlink('../temp/' + id + '.webp').then(() => {});
   });
 }
 
@@ -36,7 +36,7 @@ export default function (
     ffmpeg(stream)
       .inputFormat('mp4')
       .addOutputOptions(options)
-      .save(`./temp/${id}.webp`)
+      .save(`../temp/${id}.webp`)
       .on('end', () => {
         stream.destroy();
         modifExif(id, res => {

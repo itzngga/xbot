@@ -17,5 +17,5 @@
     "types**/*.ts",
     "nsfw_model"
   ],
-  "exclude": ["temp", "sticker", "json", "image", "groups", "gif", "fonts", "cloud"]
+  "exclude": ["temp", "sticker", "json", "image", "groups", "gif", "fonts", "cloud", "users"]
 }
