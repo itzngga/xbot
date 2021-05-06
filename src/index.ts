@@ -69,7 +69,7 @@ import {
 	ChatModification,
 	WAContactMessage,
 } from '@adiwajshing/baileys';
-import {Readable} from 'stream';
+import {buffer2Stream} from './util';
 import {Index, jadiBot, Main} from '../index';
 import { addAutoLogin, DB, hasAutoLogin, isHasLoginData, removeAutoLogin } from './login';
 const {
@@ -192,19 +192,6 @@ function formatK(num: number) {
 	return (Math.abs(num) > 999
 		? Math.sign(num) * <any>(Math.abs(num) / 1000).toFixed(1) + 'k'
 		: Math.sign(num) * Math.abs(num)) as string;
-}
-/**
- * Convert Buffer to Readable Stream
- * @param {Buffer} buffer
- * @returns {ReadableStream}
- */
-function buffer2Stream(buffer: Buffer): Readable {
-	return new Readable({
-		read() {
-			this.push(buffer);
-			this.push(null);
-		},
-	});
 }
 
 cron.schedule('0 0 0 * * *', () => {
@@ -936,7 +923,7 @@ export default class Handler {
 								.audioChannels(2)
 								.addOptions(['-ar', '44100'])
 								.save('../temp/'+msgId+'.wav')
-								.once('end', (ls) => {
+								.once('end', () => {
 									const py = child.spawn('python', ['../speech.py', msgId, lang()])
 									py.stderr.on('data', (res: any) => console.log(res.toString()))
 									py.stdout.on('data', (res: any) => {
@@ -983,9 +970,9 @@ export default class Handler {
 						client
 							.downloadMessage(message, isQuoted, '../temp/' + msgId)
 							.then(async res => {
-								child.spawn('waifu2x-converter-cpp' ,['--noise-level','3','-m','noise-scale','-i',res,'-o',res,'-s','-p','1','-j','4'])
+								child.spawn('waifu2x-converter-cpp' ,['--noise-level','3','-m','noise-scale','-i',res,'-o',res,'-s','-p','0','-j','4'])
 								.on('close', () => {
-									client.sendMessage(from, fs.readFileSync(res), image, {quoted: replyMode})
+									client.sendMessage(from, fs.readFileSync(res), image, {quoted: replyMode, thumbnail: ''})
 									fs.unlink(res, () => {});
 								})
 							})
@@ -997,7 +984,7 @@ export default class Handler {
 						reply(template.bahasa());
 					} else if (pre('list')) {
 						if (!secondParam('surah')) return;
-						reply(fs.readFileSync('../json/surah.txt', {encoding: 'utf-8'}));
+						reply(this.DB.surah);
 					} else if (pre('meme')) {
 						meme()
 							.then(async res => {
@@ -3825,7 +3812,7 @@ export default class Handler {
 							.out('xc:black')
 							.pointSize(90)
 							.font('./fonts/harta.ttf')
-							.tile('../imagerainbow.jpg')
+							.tile('../image/rainbow.jpg')
 							.drawText(0, 0, 'HARTA\nTAHTA\n' + text.toUpperCase(), 'center')
 							.wave(4.5, 64)
 							.stream('jpeg')
@@ -3840,7 +3827,7 @@ export default class Handler {
 								})
 							);
 					} else if (pre('a-harta')) {
-						const text = args[1].toUpperCase();
+						const text = getQuery('a-harta').toUpperCase();
 						if (!text || args.length > 2)
 							return reply('Maaf, perintah tidak valid');
 						if (text.length > 8)
@@ -3852,7 +3839,7 @@ export default class Handler {
 							})
 							.catch(err => console.log(err));
 					} else if (pre('harta')) {
-						const text = args[1];
+						const text = getQuery('harta');
 						if (!text || args.length > 2)
 							return reply('Maaf, perintah tidak valid');
 						if (text.length > 8)
@@ -3862,15 +3849,11 @@ export default class Handler {
 							.out('xc:black')
 							.pointSize(90)
 							.font('../fonts/harta.ttf')
-							.tile('../imagerainbow.jpg')
+							.tile('../image/rainbow.jpg')
 							.drawText(0, 0, 'HARTA\nTAHTA\n' + text.toUpperCase(), 'center')
 							.wave(4.5, 64)
 							.stream('webp')
-							.pipe(
-								concat((buffer: Buffer) => {
-									client.sendMessage(from, buffer, sticker, {quoted: replyMode});
-								})
-							);
+							.pipe(concat((buffer: Buffer) => client.sendMessage(from, buffer, sticker, {quoted: replyMode})));
 					} else if (pre('timestamp')) {
 						if (permission(['self'])) return;
 						const text = getQuery('timestamp');

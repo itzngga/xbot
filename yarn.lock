@@ -727,6 +727,13 @@
   dependencies:
     "@types/node" "*"
 
+"@types/gm@^1.18.9":
+  version "1.18.9"
+  resolved "https://registry.yarnpkg.com/@types/gm/-/gm-1.18.9.tgz#32024de48ac911befe456647989451d18eaf4bcc"
+  integrity sha512-b7ybB60YvNQzYauJs1ufviskjWvWRO3MizlU/4RAts77z4HzDbN3OMGAneQnrot0S28EMdNRo98epRUJ/orofQ==
+  dependencies:
+    "@types/node" "*"
+
 "@types/http-cache-semantics@*":
   version "4.0.0"
   resolved "https://registry.npmjs.org/@types/http-cache-semantics/-/http-cache-semantics-4.0.0.tgz"
@@ -2869,12 +2876,7 @@ eventemitter2@5.0.1, eventemitter2@^5.0.1, eventemitter2@~5.0.1:
   resolved "https://registry.npmjs.org/eventemitter2/-/eventemitter2-5.0.1.tgz"
   integrity sha1-YZegldX7a1folC9v1+qtY6CclFI=
 
-eventemitter2@^6.3.1:
-  version "6.4.4"
-  resolved "https://registry.npmjs.org/eventemitter2/-/eventemitter2-6.4.4.tgz"
-  integrity sha512-HLU3NDY6wARrLCEwyGKRBvuWYyvW6mHYv72SJJAH3iJN3a6eVUvkjFkcxah1bcTgGVBBrFdIopBJPhCQFMLyXw==
-
-eventemitter2@^6.4.4:
+eventemitter2@^6.3.1, eventemitter2@^6.4.4:
   version "6.4.4"
   resolved "https://registry.yarnpkg.com/eventemitter2/-/eventemitter2-6.4.4.tgz#aa96e8275c4dbeb017a5d0e03780c65612a1202b"
   integrity sha512-HLU3NDY6wARrLCEwyGKRBvuWYyvW6mHYv72SJJAH3iJN3a6eVUvkjFkcxah1bcTgGVBBrFdIopBJPhCQFMLyXw==

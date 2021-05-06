@@ -1,4 +1,6 @@
 import fs from 'fs-extra';
+import ffmpeg from 'fluent-ffmpeg';
+import gm from 'gm';
 const text2png = require('text2png');
 const {spawn} = require('child_process');
 
@@ -14,51 +16,34 @@ export const attp = (text: string): Promise<Buffer> =>
 				canvasx('aqua', 5, text),
 				canvasx('purple', 6, text),
 			]).then(() => {
-				const anjay = spawn('convert', [
-					'-delay',
-					'20',
-					'-loop',
-					'0',
-					'./gif/frames/*.png',
-					'-scale',
-					'150:150',
-					'./gif/ttp.gif',
-				]);
-				anjay.on('close', () => {
-					spawn('ffmpeg', [
-						'-i',
-						'./gif/ttp.gif',
-						'-vcodec',
-						'libwebp',
-						'-lossless',
-						'1',
-						'-loop',
-						'0',
-						'./gif/ttp.webp',
-					]).on('exit', () => {
-						const mediaData = fs.readFileSync('./gif/ttp.webp');
-						fs.unlink('./gif/ttp.gif', () => {
-							fs.unlink('./gif/ttp.webp', () => {});
-						});
-						return resolve(mediaData);
+				gm('../gif/frames/*.png')
+					.command('convert')
+					.delay(20)
+					.write('../gif/attp.gif', () => {
+						ffmpeg('../gif/attp.gif')
+							.videoCodec('libwebp')
+							.addOutputOptions('-lossless', '1', '-loop', '0')
+							.save('../gif/attp.webp')
+							.on('end', () => {
+								const mediaData = fs.readFileSync('../gif/attp.webp');
+								fs.unlink('../gif/attp.gif', () => {
+									fs.unlink('../gif/attp.webp', () => {});
+									fs.emptyDir('../gif/frames', () => {});
+								});
+								return resolve(mediaData);
+							});
 					});
-				});
 			});
-			// exec( 'convert -delay 20 -loop 0 ./gif/frames/*.png -scale 150:150 ./gif/ttp.gif', (error, stdout, stderr) => {
-			//     if(error) reject(error)
-			//     let mediaData = (fs.readFileSync('./gif/ttp.gif')).toString('base64')
-			//     mediaData =  `data:image/gif;base64,${mediaData}`
-			//     return resolve(mediaData)
-			// })
 		} catch (error) {
 			return reject(error);
 		}
 	});
 
 export const harta = async (text: string): Promise<Buffer> =>
-	new Promise((resolve, reject) => {
+	// eslint-disable-next-line no-async-promise-executor
+	new Promise(async (resolve, reject) => {
 		try {
-			Promise.all([
+			await Promise.all([
 				createHarta(text, 1),
 				createHarta(text, 2),
 				createHarta(text, 3),
@@ -69,30 +54,34 @@ export const harta = async (text: string): Promise<Buffer> =>
 			]).then(() => {
 				const anjay = spawn('convert', [
 					'-delay',
-					'70',
-					'./gif/frame/*.jpg',
+					'20',
+					'../gif/frame/*.jpg',
 					'-scale',
 					'150:150',
-					'./gif/harta.gif',
+					'../gif/harta.gif',
 				]);
+				anjay.on('error', console.log);
 				anjay.on('close', () => {
 					spawn('ffmpeg', [
 						'-i',
-						'./gif/harta.gif',
+						'../gif/harta.gif',
 						'-vcodec',
 						'libwebp',
 						'-lossless',
 						'1',
 						'-loop',
 						'0',
-						'./gif/harta.webp',
-					]).on('exit', () => {
-						const mediaData = fs.readFileSync('./gif/harta.webp');
-						fs.unlink('./gif/harta.gif', () => {
-							fs.unlink('./gif/harta.webp', () => {});
+						'../gif/harta.webp',
+					])
+						.on('error', console.log)
+						.on('exit', () => {
+							const mediaData = fs.readFileSync('../gif/harta.webp');
+							fs.unlink('../gif/harta.gif', () => {
+								fs.unlink('../gif/harta.webp', () => {});
+								fs.emptyDir('../gif/frame', () => {});
+							});
+							return resolve(mediaData);
 						});
-						return resolve(mediaData);
-					});
 				});
 			});
 		} catch (error) {
@@ -100,36 +89,18 @@ export const harta = async (text: string): Promise<Buffer> =>
 		}
 	});
 
-const createHarta = (text: string, number: number): Promise<boolean> =>
+const createHarta = (text: string, number: number): Promise<void> =>
 	new Promise(resolve => {
-		async function render(
-			name: string,
-			text: string,
-			number: number
-		): Promise<boolean> {
-			return spawn('convert', [
-				'-size',
-				'512x512',
-				'-background',
-				'black',
-				'xc:black',
-				'-pointsize',
-				'90',
-				'-font',
-				'./fonts/harta.ttf',
-				'-gravity',
-				'center',
-				'-tile',
-				'./image/' + name + '.jpg',
-				'-annotate',
-				'+0+0',
-				'HARTA\nTAHTA\n' + text,
-				'-wave',
-				'4.5x64',
-				'./gif/frame/' + number + '.jpg',
-			]).on('exit', () => {
-				return true;
-			});
+		function render(name: string, text: string, number: number): void {
+			return gm()
+				.rawSize(512, 512)
+				.out('xc:black')
+				.pointSize(90)
+				.font('../fonts/harta.ttf')
+				.tile('../image/' + name + '.jpg')
+				.drawText(0, 0, 'HARTA\nTAHTA\n' + text, 'center')
+				.wave(4.5, 64)
+				.write('../gif/frame/' + number + '.jpg', () => Promise.resolve());
 		}
 		switch (number) {
 			case 1:
@@ -154,10 +125,10 @@ async function canvasx(
 	text: string
 ): Promise<Buffer | void> {
 	return fs.writeFile(
-		'./gif/frames/frame' + i + '.png',
+		'../gif/frames/frame' + i + '.png',
 		text2png(wordWrap(text, 8), {
 			font: '145px Boogaloo',
-			localFontPath: './fonts/Boogaloo.ttf',
+			localFontPath: '../fonts/Boogaloo.ttf',
 			localFontName: 'Boogaloo',
 			color: color,
 			strokeWidth: 2,

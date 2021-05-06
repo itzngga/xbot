@@ -39,6 +39,7 @@
   "dependencies": {
     "@adiwajshing/baileys": "https://github.com/adiwajshing/Baileys",
     "@tensorflow/tfjs-node": "^3.3.0",
+    "@types/gm": "^1.18.9",
     "awesome-phonenumber": "^2.47.0",
     "axios": "^0.21.1",
     "bitly": "^7.1.2",
