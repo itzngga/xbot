@@ -13,5 +13,9 @@
   "fakeJid": "0@s.whatsapp.net",
   "antiVirtex": false,
   "universalPublic": false,
-  "absen": "Bambang"
+  "absen": "",
+  "voiceCmd": false,
+  "mention": false,
+  "mentionMsg": "",
+  "antiTroli": false
 }

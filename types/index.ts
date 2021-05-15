@@ -37,6 +37,9 @@ export type settingType = {
 	universalPublic: boolean;
 	absen: string;
 	voiceCmd: boolean;
+	mention: boolean;
+	mentionMsg: string;
+	antiTroli: boolean;
 };
 
 export type waitMessageObj = {

@@ -19,6 +19,7 @@ export const login = (jid: string): AnyAuthenticationCredentials =>
 	loginData.getObject<AnyAuthenticationCredentials>('/' + jid);
 export const addLogin = (jid: string, auth: AnyAuthenticationCredentials) =>
 	loginData.push('/' + jid, auth);
+export const removeLogin = (jid: string): void => loginData.delete(jid);
 export const autoLogin = new Set(loginData.getObject<string[]>('/autoLogin'));
 export const hasAutoLogin = (jid: string) => autoLogin.has(jid);
 export const addAutoLogin = (jid: string) => {
@@ -50,6 +51,7 @@ const isExist2 = (db: JsonDB, path: string, json: any) => {
 	if (db.exists(path)) return true;
 	return db.push(path, json, true);
 };
+isExist2(loginData, '/autoLogin', {autoLogin: []});
 export class DB {
 	protected _db: JsonDB;
 	protected _genshin: JsonDB;
@@ -71,7 +73,6 @@ export class DB {
 		this._db = new JsonDB('../users/' + jid + '/db.json', true, true);
 		this._genshin = new JsonDB('../users/' + jid + '/genshin.json', true, true);
 		const genshin = fs.readJSONSync('../json/raw/genshin.json');
-		isExist2(loginData, '/autoLogin', {autoLogin: []});
 		isExist(this._db, '/setting', '../json/raw/setting.json');
 		isExist(this._db, '/sticker', '../json/raw/sticker.json');
 		isExist(this._db, '/config', '../json/raw/config.json');

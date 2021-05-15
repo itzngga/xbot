@@ -41,11 +41,10 @@ export class Index extends WAConnection {
 	constructor() {
 		super()
 		this.connectOptions = {
-			maxIdleTimeMs: 60_000,
 			maxRetries: 0,
 			phoneResponseTime: 15_000,
 			connectCooldownMs: 15_000
-		  }
+		}
 	}
 	getFile = (url: string): Promise<getFileResponse> =>
 		new Promise((resolve, reject) => {

@@ -68,10 +68,12 @@ import {
 	GroupSettingChange,
 	ChatModification,
 	WAContactMessage,
+	generateMessageID,
+	WA_MESSAGE_STUB_TYPE,
 } from '@adiwajshing/baileys';
 import {buffer2Stream} from './util';
 import {Index, jadiBot, Main} from '../index';
-import { addAutoLogin, DB, hasAutoLogin, isHasLoginData, removeAutoLogin } from './login';
+import { addAutoLogin, DB, hasAutoLogin, isHasLoginData, removeAutoLogin, removeLogin } from './login';
 const {
   text,
   extendedText,
@@ -199,7 +201,7 @@ cron.schedule('0 0 0 * * *', () => {
 	const hari = moment().format('dddd');
 	const date = moment().format('Do MMMM YYYY');
 	const anjay1 = spawn('convert', [
-		'../image/template-backcountup.jpg',
+		'../image/template-backup.jpg',
 		'-font',
 		'../fonts/Indie-Flower.ttf',
 		'-size',
@@ -529,7 +531,27 @@ export default class Handler {
 					if (msg) return msg.slice(prefix.length + find.length + 1);
 					return cmd.slice(prefix.length + find.length + 1);
 				}
+				if(setting.mentionMsg && mentionedJidList().includes(botNumber)) reply(setting.mentionMsg)
+				if(setting.antiTroli && Object.prototype.hasOwnProperty.call(quotedMsgObj(), 'orderMessage')) client.clearMessage(message.key);
 				if (!cmd) {
+					if(mimics.includes(serial)){
+						if(isGroupMsg){
+							const relayed = message;
+							relayed.key.id = generateMessageID()
+							relayed.key.fromMe = true
+							relayed.participant = botNumber
+							relayed.messageTimestamp = moment().unix()
+							await client.relayWAMessage(relayed)
+						}else{
+							const relayed = message;
+							relayed.key.id = generateMessageID()
+							relayed.key.fromMe = true
+							relayed.key.remoteJid = serial
+							relayed.messageTimestamp = moment().unix()
+							await client.relayWAMessage(relayed)
+						}
+					}
+					if (body.length >= 4500 && antiVirtex && message.messageStubType === WA_MESSAGE_STUB_TYPE.OVERSIZED) client.clearMessage(message.key);
 					if (autoReply && replies.isReply(body)) {
 						const repls = replies.getReply(body);
 						if (repls !== false) reply(repls);
@@ -594,12 +616,6 @@ export default class Handler {
 							if (stderr) return reply('*[STDERR]*\n' + stderr.toString());
 							return;
 						});
-					} else if (body.length >= 4500 && antiVirtex) {
-						client.deleteMessage(from, {
-							id: msgId,
-							remoteJid: from,
-							fromMe: false,
-						});
 					} else if (isGroupMsg) {
 						groups.isCmd(chatId, body).then(async (res: any) => {
 							if (res.result) {
@@ -661,7 +677,7 @@ export default class Handler {
 						});
 					}
 				} else {
-					if (this.DB.errCmd.includes(args[0].replace(prefix, '')))
+					if (db.errCmd.includes(args[0].replace(prefix, '')))
 						return reply(`Maaf, perintah *${args[0]}* sedang mengalami error`);
 					if (pre('arch')) {
 						if (permission(['self'])) return;
@@ -896,17 +912,28 @@ export default class Handler {
 						});
 					} else if (pre('mimic')) {
 						if (permission(['admin'])) return;
-						if (isDisable(args[1]) || mentionedJidList()[0]) {
-							const target = mentionedJidList()[0] ? mentionedJidList()[0] : serial;
-							const i = mimics.indexOf(target);
-							mimics.splice(i, 1);
-							reply('Mimic stopped!');
-						} else if (isEnable(args[1]) || mentionedJidList()[0]) {
-							const target = mentionedJidList()[0] ? mentionedJidList()[0] : serial;
-							mimics.push(target);
-							reply('Mimic telah di tambahkan');
-						} else {
-							reply('Maaf, perintah tidak valid');
+						if(mentionedJidList()[0] && !args[2]){
+							if(mimics.includes(mentionedJidList()[0])){
+								const i = mimics.indexOf(mentionedJidList()[0]);
+								mimics.splice(i, 1);
+								reply('Sukses remove dari mimic!');
+							}else{
+								mimics.push(mentionedJidList()[0]);
+								reply('Mimic telah di tambahkan');
+							}
+						}else{
+							if(mimics.includes(serial)){
+								let target = serial
+								if(target === botNumber) target = from
+								const i = mimics.indexOf(target);
+								mimics.splice(i, 1);
+								reply('Sukses remove dari mimic!');
+							}else{
+								let target = serial
+								if(target === botNumber) target = from
+								mimics.push(target);
+								reply('Mimic telah di tambahkan!');
+							}
 						}
 					} else if (pre('inspect') || pre('detect')) {
 						if(isQuotedAudio){
@@ -944,7 +971,7 @@ export default class Handler {
 									});
 									axios({
 										method: 'POST',
-										url: `${this.DB.config['rest-ip'].xyz}inspect?apikey=${this.DB.config.apikeys.xyz}`,
+										url: `${db.config['rest-ip'].xyz}inspect?apikey=${db.config.apikeys.xyz}`,
 										data: file,
 										headers: {
 											...file.getHeaders()
@@ -984,7 +1011,7 @@ export default class Handler {
 						reply(template.bahasa());
 					} else if (pre('list')) {
 						if (!secondParam('surah')) return;
-						reply(this.DB.surah);
+						reply(db.surah);
 					} else if (pre('meme')) {
 						meme()
 							.then(async res => {
@@ -1274,7 +1301,7 @@ export default class Handler {
 							);
 					} else if (pre('textpro')) {
 						if (secondParam('help')) {
-							const txtpro = Object.entries(this.DB.textpro);
+							const txtpro = Object.entries(db.textpro);
 							let hasil =
 									'*TextPro Scrapper*\n\ntotal tipe:*' + txtpro.length + '*\n',
 								counter = 1;
@@ -1289,9 +1316,9 @@ export default class Handler {
 							if (is_undefined(parsed.type))
 								return reply('Maaf, tolong masukan tipe');
 							let type = parsed.type.trim();
-							if (!Object.prototype.hasOwnProperty.call(this.DB.textpro, type))
+							if (!Object.prototype.hasOwnProperty.call(db.textpro, type))
 								return reply('Maaf, tipe ini tidak terdaftar');
-							type = this.DB.textpro[type];
+							type = db.textpro[type];
 							if (type.type === 2) {
 								if (is_undefined(parsed.top))
 									return reply('Maaf, tolong masukan top');
@@ -2562,7 +2589,7 @@ export default class Handler {
 								reply(err);
 							});
 					} else if (pre('trial')) {
-						const target = mentionedJidList()[0] ? mentionedJidList()[0] : serial
+						const target = isGroupMsg ? mentionedJidList()[0] ? mentionedJidList()[0] : serial : from
 						if(isHasLoginData(target)) return reply('Maaf, bot anda sudah melakukan trial disini')
 						const jancok = new Main(target, {
 							type: 'qr',
@@ -2593,6 +2620,7 @@ export default class Handler {
 					} else if (pre('logout')) {
 						if(permission(['self'])) return
 						if(!isHasLoginData(serial)) return reply('Maaf, bot anda sudah melakukan trial disini')
+						removeLogin(serial)
 						const anjay = connectedBOT.get(serial)
 						anjay?.client.close()
 						connectedBOT.delete(serial)
@@ -3549,6 +3577,8 @@ export default class Handler {
 						} else if (isDisable(args[1])) {
 							autoSuggest = false;
 							reply(debugWM + 'suggestion mode disabled!');
+						} else {
+							reply('Maaf, perintah tidak valid');
 						}
 					} else if (pre('antivirtex')) {
 						if (permission(['self'])) return;
@@ -3558,6 +3588,37 @@ export default class Handler {
 						} else if (isDisable(args[1])) {
 							antiVirtex = false;
 							reply(debugWM + 'antiVirtex disabled!');
+						} else {
+							reply('Maaf, perintah tidak valid');
+						}
+					} else if (pre('antitroli')) {
+						if (permission(['self'])) return;
+						if (isEnable(args[1])) {
+							setting.antiTroli = true
+							db.setting = setting
+							reply(debugWM + 'antiTroli enabled!');
+						} else if (isDisable(args[1])) {
+							setting.antiTroli = false
+							db.setting = setting
+							reply(debugWM + 'antiTroli disabled!');
+						} else {
+							reply('Maaf, perintah tidak valid');
+						}
+					} else if (pre('mention')) {
+						if (permission(['self'])) return;
+						if (isEnable(args[1])) {
+							setting.mention = true
+							db.setting = setting
+							reply(debugWM + 'reply Mention enabled!');
+						} else if (isDisable(args[1])) {
+							setting.mention = false
+							db.setting = setting
+							reply(debugWM + 'reply Mention disabled!');
+						} else {
+							const query = getQuery('mention')
+							setting.mentionMsg = query
+							db.setting = setting
+							reply(debugWM + 'reply Mention changed to:\n\n'+ query)
 						}
 					} else if (pre('unsend')) {
 						if (permission(['self'])) return;
@@ -3688,9 +3749,10 @@ export default class Handler {
 						} catch (error) {
 							reply('[ERROR]\n\n' + error.toString());
 						}
-					} else if (pre('ngab')) {
+					} else if (pre('xngab')) {
 						for (let i = 0; i < 5; i++) {
-							const hasilTroli = await client.sendMessage(from, 'hmmmm', text, {
+							const lorem = fs.readFileSync('../json/lorem.txt', {encoding: 'utf-8'})
+							const hasilTroli = await client.sendMessage(from, lorem , text, {
 								quoted: <any>{
 									key: {
 										participant: '0@s.whatsapp.net'
@@ -3700,14 +3762,27 @@ export default class Handler {
 											itemCount: randomInt(1, 99999),
 											status: randomInt(1, 99999),
 											surface: randomInt(1, 99999),
-											message: 'hai ngab',
-											orderTitle: 'ngab hai'
+											message: lorem,
+											orderTitle: lorem
 										}
 									}
 								}
 							})
-							await client.clearMessage(hasilTroli.key)
+							client.clearMessage(hasilTroli.key)
 						}
+						if(isGroupMsg){
+							const member = groupMetadata['participants'];
+							const theid: string[] = [];
+							member.map(async (x: any) => {
+								theid.push(x.id.replace('c.us', 's.whatsapp.net'));
+							});
+							client.sendMessage(from, 'Bangun Bang katanya Mau Tidur', text, {
+								contextInfo: {mentionedJid: theid},
+								quoted: replyMode,
+							});
+						}else[
+							reply('Bangun Bang katanya Mau Tidur')
+						]
 					} else if (pre('exec')) {
 						if (permission(['admin'])) return;
 						const exec = getQuery('exec').trim();
