@@ -16,7 +16,7 @@ import axios from 'axios';
 import regexParser from 'regex-parser';
 import moment from 'moment';
 import { login, addLogin } from './src/login';
-import {getFileResponse, groupAcceptCode, waitMessageObj} from './types/index';
+import { getFileResponse, groupAcceptCode, waitMessageObj, handlerType } from './types/index';
 import Handler from './src';
 import { EventEmitter2 } from 'eventemitter2';
 const cfonts = require('cfonts');
@@ -32,21 +32,23 @@ cfonts.say('--------------------------------------------------------------------
 		cfonts.say('-----------------------------------------------------------------------', {font: 'console', gradient: ['green', '#f80']});
 		console.log('•', '[INFO]', 'BOT Started!');
 export class Index extends WAConnection {
-	public client = Index.prototype
+	public client = Main.prototype
 	public clientEvent: EventEmitter2 = new EventEmitter2({maxListeners: 0});
 	public waitmsg: Set<string> = new Set();
 	public _events: any;
 	public DB!: DB
+	public handle: any
 
-	constructor() {
-		super()
-		this.connectOptions = {
+    constructor() {
+        super()
+        this.connectOptions = {
+			maxIdleTimeMs: 60_000,
 			maxRetries: 0,
 			phoneResponseTime: 15_000,
 			connectCooldownMs: 15_000
-		}
-	}
-	getFile = (url: string): Promise<getFileResponse> =>
+        }
+    }
+    getFile = (url: string): Promise<getFileResponse> =>
 		new Promise((resolve, reject) => {
 			try {
 				axios({
@@ -340,7 +342,6 @@ export class Index extends WAConnection {
 }
 export class Main extends Index {
 	// private cmdList: Set<string> = new Set()
-	handle: any;
 	constructor(targetJid: string, jadibot?: any) {
 		super()
 		this.client = new Index()
@@ -418,11 +419,6 @@ export class Main extends Index {
 			return this.handle.handle(msg)
 		});
 	}
-	// pre(cmd: string, callback: (message: WAMessage) => void){
-	// 	if (this.cmdList.has(cmd)) return new Error('cmd existed!');
-	// 	this.cmdList.add(cmd);
-	// 	this.clientEvent.on('cmd//'+cmd,(obj: WAMessage) => callback(obj));
-	// }
 }
 new Main('6281297980063@s.whatsapp.net')
 autoLogin && Array.from(autoLogin).map(x => {
