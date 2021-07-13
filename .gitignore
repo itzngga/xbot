@@ -1,5 +1,7 @@
 node_modules
-gif/frames/*.png
-gif/frame/*.jpg
-dist
+dist/*
+sticker/*
+users/*
+cloud/*
+temp/*
 json/loginData.json

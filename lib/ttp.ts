@@ -1,6 +1,6 @@
 import fs from 'fs-extra';
 import ffmpeg from 'fluent-ffmpeg';
-import gm from 'gm';
+const gm = require('gm');
 const text2png = require('text2png');
 const {spawn} = require('child_process');
 

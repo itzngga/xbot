@@ -100,6 +100,8 @@ export class DB {
 		this._textpro = fs.readJSONSync('../json/textpro.json');
 		this._arryOfWords = fs.readJSONSync('../json/filters.json');
 		this._surah = fs.readFileSync('../json/surah.txt', {encoding: 'utf-8'});
+		!fs.existsSync('../dist/nsfw_model') &&
+			fs.copySync('../nsfw_model', '../dist/nsfw_model');
 	}
 	public get db() {
 		return this._db;

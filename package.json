@@ -1,7 +1,7 @@
 {
-  "name": "self-type",
-  "version": "1.0.0",
-  "description": "",
+  "name": "xbot",
+  "version": "1.0.1",
+  "description": "Powerfull Bot Builded With TypeScript",
   "main": "dist/index.js",
   "files": [
     "dist",
@@ -21,7 +21,23 @@
     "posttest": "npm run lint"
   },
   "author": "ItzNgga",
-  "license": "GPL-3.0",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ItzNgga/xbot/issues"
+  },
+  "homepage": "https://github.com/ItzNgga/xbot",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ItzNgga/xbot.git"
+  },
+  "engines": {
+    "node": ">= 10"
+  },
+  "keywords": [
+    "bot",
+    "whatsapp",
+    "automation"
+  ],
   "devDependencies": {
     "@types/fluent-ffmpeg": "^2.1.16",
     "@types/fs-extra": "^9.0.8",
@@ -48,6 +64,7 @@
     "canvas": "^2.7.0",
     "cfonts": "^2.9.1",
     "cheerio": "^1.0.0-rc.5",
+    "chroma-js": "^2.1.2",
     "common-tags": "^1.8.0",
     "concat-stream": "^2.0.0",
     "crypto-js": "^4.0.0",

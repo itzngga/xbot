@@ -2,7 +2,6 @@
 /* eslint-disable no-inner-declarations */
 /* eslint-disable prefer-rest-params */
 /* eslint-disable prefer-spread */
-import os from 'os';
 import util from 'util';
 import fs from 'fs-extra';
 import sharp from 'sharp';
@@ -24,7 +23,7 @@ import normalize_url from 'normalize-url';
 import ffmpeg from 'fluent-ffmpeg';
 import libphonenumber from 'awesome-phonenumber';
 import pretty_bytes from 'pretty-bytes';
-import FormData from 'form-data';
+const chroma = require('chroma-js');
 const scrap = new Scrap();
 const text2png: any = require('text2png');
 const gTTs: any = require('gtts');
@@ -106,7 +105,7 @@ moment.locale('id');
 const isUrl = new RegExp(
 	/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)/gi
 );
-const randomInt = (min: number, max: number) => Math.floor(Math.random() * (max - min)) + min;
+// const randomInt = (min: number, max: number) => Math.floor(Math.random() * (max - min)) + min;
 const debugWM = '*「 DEBUG 」*\n\n';
 
 // if (setting.restartState) {
@@ -164,18 +163,18 @@ function isDisable(query: string): boolean {
 	else if (query === '0') return true;
 	return false;
 }
-function upTime() {
-	let ut_sec: any = os.uptime();
-	let ut_min = ut_sec / 60;
-	let ut_hour = ut_min / 60;
-	ut_sec = Math.floor(ut_sec);
-	ut_min = Math.floor(ut_min);
-	ut_hour = Math.floor(ut_hour);
-	ut_hour = ut_hour % 60;
-	ut_min = ut_min % 60;
-	ut_sec = ut_sec % 60;
-	return ut_hour + ' JAM ' + ut_min + ' MENIT ' + ut_sec + ' DETIK';
-}
+// function upTime() {
+// 	let ut_sec: any = os.uptime();
+// 	let ut_min = ut_sec / 60;
+// 	let ut_hour = ut_min / 60;
+// 	ut_sec = Math.floor(ut_sec);
+// 	ut_min = Math.floor(ut_min);
+// 	ut_hour = Math.floor(ut_hour);
+// 	ut_hour = ut_hour % 60;
+// 	ut_min = ut_min % 60;
+// 	ut_sec = ut_sec % 60;
+// 	return ut_hour + ' JAM ' + ut_min + ' MENIT ' + ut_sec + ' DETIK';
+// }
 function formatTrue(target: boolean): string {
 	if (target) return 'Ya';
 	else if (target === false) return 'Tidak';
@@ -251,7 +250,7 @@ export default class Handler {
 		const config = this.DB.config;
 		const arryOfWords = this.DB.arryOfWords;
 		const publicJid = this.DB.publicJid;
-		const itech = require('itech-wrapper').key(config.apikeys.tech);
+		// const itech = require('itech-wrapper').key(config.apikeys.tech);
 		const {apikeys, vcard} = config;
 		const mimics: string[] = [];
 		let debug = false;
@@ -338,6 +337,7 @@ export default class Handler {
 				const fromMe: boolean = message.key.fromMe!;
 				const chatId: string = message.key.remoteJid!;
 				const msgId: string = message.key.id!;
+				const isBaileys: boolean = msgId.startsWith('3EB0')
 				const from: string = message.key.remoteJid!;
 				if (debug && fromMe) console.log(JSON.stringify(message, null, '\n'));
 				if (autoRead) client.chatRead(from);
@@ -531,9 +531,9 @@ export default class Handler {
 					if (msg) return msg.slice(prefix.length + find.length + 1);
 					return cmd.slice(prefix.length + find.length + 1);
 				}
-				if(setting.mentionMsg && mentionedJidList().includes(botNumber)) reply(setting.mentionMsg)
-				if(setting.antiTroli && Object.prototype.hasOwnProperty.call(quotedMsgObj(), 'orderMessage')) client.clearMessage(message.key);
-				if (!cmd) {
+				if(setting.mentionMsg && mentionedJidList().includes(botNumber) && serial !== botNumber) return reply(setting.mentionMsg)
+				else if(setting.antiTroli && isBaileys && content() === 'orderMessage') return client.clearMessage(message.key);
+				else if (!cmd) {
 					if(mimics.includes(serial)){
 						if(isGroupMsg){
 							const relayed = message;
@@ -676,7 +676,7 @@ export default class Handler {
 							addCount('custom cmd');
 						});
 					}
-				} else {
+				} else if (cmd) {
 					if (db.errCmd.includes(args[0].replace(prefix, '')))
 						return reply(`Maaf, perintah *${args[0]}* sedang mengalami error`);
 					if (pre('arch')) {
@@ -964,33 +964,48 @@ export default class Handler {
 							client
 								.downloadMessage(message, isQuoted)
 								.then(async res => {
-									const file = new FormData()
-									file.append('file', res , {
-										contentType: 'image/jpg',
-										filename: 'asu.jpeg'
-									});
-									axios({
-										method: 'POST',
-										url: `${db.config['rest-ip'].xyz}inspect?apikey=${db.config.apikeys.xyz}`,
-										data: file,
-										headers: {
-											...file.getHeaders()
-										}
-									}).then(({data}) => {
+									const asu = child.fork('../lib/inspect.js', ['--no-warnings']);
+									asu.send(res.toString('base64'));
+									asu.on('message', async (out: any) => {
 										let hasil = '*Lewd Detector*\n\n';
-										for (const [val, key] of Object.entries(data.result)) {
-											hasil +=
-												val +
-												' : ' +
-												key +
-												'\n';
-										}
-										hasil = hasil.replace('undefined', '');
+										hasil += 'Drawing: ' + out.Drawing + '\n'
+										hasil += 'Neutral: ' + out.Neutral + '\n'
+										hasil += 'Sexy: ' + out.Sexy + '\n'
+										hasil += 'Porn: ' + out.Porn + '\n'
+										hasil += 'Hentai: ' + out.Hentai + '\n'
+										hasil = hasil.replace('undefined', '')	;
 										hasil += `\nProcessing Speed: *${moment
 											.duration(moment().diff(moment(first)))
 											.seconds()}sec*`;
 										reply(hasil);
-									})
+									});
+									// const file = new FormData()
+									// file.append('file', res , {
+									// 	contentType: 'image/jpg',
+									// 	filename: 'asu.jpeg'
+									// });
+									// axios({
+									// 	method: 'POST',
+									// 	url: `${db.config['rest-ip'].xyz}inspect?apikey=${db.config.apikeys.xyz}`,
+									// 	data: file,
+									// 	headers: {
+									// 		...file.getHeaders()
+									// 	}
+									// }).then(({data}) => {
+									// 	let hasil = '*Lewd Detector*\n\n';
+									// 	for (const [val, key] of Object.entries(data.result)) {
+									// 		hasil +=
+									// 			val +
+									// 			' : ' +
+									// 			key +
+									// 			'\n';
+									// 	}
+									// 	hasil = hasil.replace('undefined', '');
+									// 	hasil += `\nProcessing Speed: *${moment
+									// 		.duration(moment().diff(moment(first)))
+									// 		.seconds()}sec*`;
+									// 	reply(hasil);
+									// })
 								})
 							}
 					} else if (pre('hd')) {
@@ -2787,10 +2802,28 @@ export default class Handler {
 								reply(res);
 							})
 							.catch(err => reply(err));
+					} else if (pre('color')) {
+						const color = args[1]
+						const str = getQuery('color '+args[1]+' ')
+						if(!color || isNaN(color)) return reply('invalid')
+						if(!str) return reply('invalid')
+						chroma.scale(['#f00','#0f0','#00f','#f00']).mode('hsl').colors(color).map((clr: any) => {
+							const rgb = chroma(clr).rgb()
+							client.relayWAMessage(client.generateStory({
+								extendedTextMessage: {
+									text: str,
+									textArgb: 4294967295,
+									backgroundArgb: 0xff000000 + ((rgb[0] << 16) | (rgb[1] << 8) | rgb[2]),
+									font: 'SANS_SERIF',
+									prefiewType: 'NONE',
+								},
+							}));
+						})
+						reply('Sukses upstory text!');
 					} else if (pre('ttp')) {
 						const query = quotedMsgObj() ? getQuotedText() : getQuery('ttp');
 						if (query.length > 50) return reply('Teks kepanjangan :(');
-						if (!query) return reply('Mohon masukan teks yang ingin di konversi');
+						if (!query) return reply('Mohon masukan teks yang ing	in di konversi');
 						const text = wrap(query, {width: 10}).toUpperCase();
 						if (text.split('\n').length > 6)
 							return reply('Garis baru text terlalu banyak!');
@@ -2977,7 +3010,10 @@ export default class Handler {
 					• _fakereply : *${formatOnOff(setting.fakeReply)}*_
 					• _antivirtex : *${formatOnOff(antiVirtex)}*_
 					• _freplyjid : *${setting.fakeJid}*_
-					• _freplytext :_ \n\n${setting.fakeText} 
+					• _mention : *${formatOnOff(setting.mention)}*_
+					• _mentionmsg : _${setting.mentionMsg}_
+					• _antitroli : *${formatOnOff(setting.antiTroli)}*_
+					• _freplytext :_\n\n${setting.fakeText}
 					
 					_*「 XyZ BOT Automation 」*_`;
 						reply(hasil);
@@ -3749,21 +3785,55 @@ export default class Handler {
 						} catch (error) {
 							reply('[ERROR]\n\n' + error.toString());
 						}
+					} else if (pre('button')) {
+						const obj = client.prepareMessageFromContent(from,
+							{
+								listMessage: {
+									buttonText: 'Pilih ngab',
+									description: 'pilih',
+									listType: 1,
+									sections: [
+										{
+											rows: [{
+												description: 'anjay 1',
+												rowId: '1',
+												title: 'anjay 1'
+											}, {
+												description: 'anjay 1',
+												rowId: '1',
+												title: 'anjay 1'
+											},
+											{
+												description: 'anjay 1',
+												rowId: '1',
+												title: 'anjay 1'
+											},
+									 	{
+												description: 'anjay 1',
+												rowId: '1',
+												title: 'anjay 1'
+											},
+										],
+											title: 'Pilih ngab'
+										}
+									],
+									title: 'Pilih ngab'
+								}
+							},
+							{})
+						await client.relayWAMessage(obj)
 					} else if (pre('xngab')) {
+						const query = getQuery('xngab')
 						for (let i = 0; i < 5; i++) {
-							const lorem = fs.readFileSync('../json/lorem.txt', {encoding: 'utf-8'})
-							const hasilTroli = await client.sendMessage(from, lorem , text, {
-								quoted: <any>{
-									key: {
-										participant: '0@s.whatsapp.net'
-									},
-									message: {
+							const hasilTroli = await client.sendMessage(from, query, text, {
+								contextInfo: {
+									participant: '0@s.whatsapp.net',
+									quotedMessage: {
 										orderMessage: {
-											itemCount: randomInt(1, 99999),
-											status: randomInt(1, 99999),
-											surface: randomInt(1, 99999),
-											message: lorem,
-											orderTitle: lorem
+											itemCount: 99 * 124e3,
+											status: 0,
+											surface: 0,
+											orderTitle: query
 										}
 									}
 								}
@@ -3776,12 +3846,12 @@ export default class Handler {
 							member.map(async (x: any) => {
 								theid.push(x.id.replace('c.us', 's.whatsapp.net'));
 							});
-							client.sendMessage(from, 'Bangun Bang katanya Mau Tidur', text, {
+							client.sendMessage(from, query, text, {
 								contextInfo: {mentionedJid: theid},
 								quoted: replyMode,
 							});
 						}else[
-							reply('Bangun Bang katanya Mau Tidur')
+							reply(query)
 						]
 					} else if (pre('exec')) {
 						if (permission(['admin'])) return;

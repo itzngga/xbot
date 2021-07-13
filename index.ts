@@ -16,7 +16,7 @@ import axios from 'axios';
 import regexParser from 'regex-parser';
 import moment from 'moment';
 import { login, addLogin } from './src/login';
-import { getFileResponse, groupAcceptCode, waitMessageObj, handlerType } from './types/index';
+import { getFileResponse, groupAcceptCode, waitMessageObj } from './types/index';
 import Handler from './src';
 import { EventEmitter2 } from 'eventemitter2';
 const cfonts = require('cfonts');
@@ -24,13 +24,18 @@ const qrcode = require('qrcode');
 export const jadiBot = new EventEmitter2()
 
 cfonts.say('-----------------------------------------------------------------------', {font: 'console', gradient: ['green', '#f80']});
-		cfonts.say('XYZ BOT', {
-			font: 'block',
-			background: 'transparent',
-			gradient: ['green','#f80']
-		})
-		cfonts.say('-----------------------------------------------------------------------', {font: 'console', gradient: ['green', '#f80']});
-		console.log('•', '[INFO]', 'BOT Started!');
+cfonts.say('XYZ BOT', {
+	font: 'block',
+	background: 'transparent',
+	gradient: ['green','#f80']
+})
+cfonts.say('-----------------------------------------------------------------------', {font: 'console', gradient: ['green', '#f80']});
+console.log('•', '[INFO]', 'BOT Started!');
+if(require('os').platform() === 'android'){
+	console.error('Im really sorry you cannot run this on Android based')
+	// eslint-disable-next-line no-process-exit
+	process.exit(0)
+}
 export class Index extends WAConnection {
 	public client = Main.prototype
 	public clientEvent: EventEmitter2 = new EventEmitter2({maxListeners: 0});
@@ -41,12 +46,12 @@ export class Index extends WAConnection {
 
     constructor() {
         super()
-        this.connectOptions = {
-			maxIdleTimeMs: 60_000,
-			maxRetries: 0,
-			phoneResponseTime: 15_000,
-			connectCooldownMs: 15_000
-        }
+        // this.connectOptions = {
+		// 	maxIdleTimeMs: 60_000,
+		// 	maxRetries: 0,
+		// 	phoneResponseTime: 15_000,
+		// 	connectCooldownMs: 15_000
+        // }
     }
     getFile = (url: string): Promise<getFileResponse> =>
 		new Promise((resolve, reject) => {
@@ -108,9 +113,17 @@ export class Index extends WAConnection {
 			}
 		});
 	}
+	/**
+	 * Add a contact from Jid
+	 * @param jid the id to send to
+	 */
 	addContact(jid: string) {
 		return this.contactAddOrGet(jid);
 	}
+	/**
+	 * Generate fakereply thumb from text
+	 * @param fakeText text for FakeReply overlay
+	 */
 	generateFakeReply(fakeText: string) {
 		return {
 			key: {
@@ -140,6 +153,10 @@ export class Index extends WAConnection {
 			},
 		} as any;
 	}
+	/**
+	 * Generate story obj from message Obj
+	 * @param status proto.IMessage Obj
+	 */
 	generateStory(status: any) {
 		return WAMessageProto.WebMessageInfo.fromObject({
 			key: {
@@ -153,6 +170,13 @@ export class Index extends WAConnection {
 			status: WA_MESSAGE_STATUS_TYPE.ERROR,
 		});
 	}
+	/**
+	 * Download a given WebMessageInfo Obj
+	 * @param message WAMessage Obj
+	 * @param quoted? WAMessage Quoted
+	 * @param path? Given path to save
+	 * @param ext? Auto detect ext
+	 */
 	async downloadMessage(
 		message: WAMessage,
 		quoted?: any,
@@ -173,6 +197,12 @@ export class Index extends WAConnection {
 			return new BaileysError(error, message);
 		}
 	}
+	/**
+	 * Toggle a Ephemeral Bug
+	 * @param jid the id to send
+	 * @param ephemeralExpiration ephemeralExpiration
+	 * @param opts Extra options
+	 */
 	async toggleEpBug(
 		jid: string,
 		ephemeralExpiration?: number,
@@ -185,36 +215,60 @@ export class Index extends WAConnection {
 		);
 		await this.relayWAMessage(message, opts);
 	}
-	/** Join to given qrcode */
+	/**
+	 * Join a group from given Whatsapp Group Code
+	 * @param code Whatsapp Group Code
+	 */
 	async groupAcceptCode(code: string): Promise<proto.GroupInviteMessage> {
 		code = code.replace('https://chat.whatsapp.com/', '');
 		const json = ['action', 'invite', code];
 		const response = await this.query({json});
 		return response;
 	}
+	/**
+	 * Invite Info from Whatsapp Group Code
+	 * @param code Whatsapp Group Code
+	 */
 	async groupInviteInfo(code: string): Promise<groupAcceptCode> {
 		code = code.replace('https://chat.whatsapp.com/', '');
 		const json = ['query', 'invite', code];
 		const response = await this.query({json});
 		return response;
 	}
+	/**
+	 * Gets all Group
+	 */
 	async getAllGroups(): Promise<Array<WAChat>> {
 		return new Promise(resolve => {
 			const chats = this.chats.all();
 			return resolve(chats.filter(x => x.jid.includes('@g.us') && x.metadata));
 		});
 	}
+	/**
+	 * Gets all private chat
+	 */
 	async getAllPrivate(): Promise<Array<WAChat>> {
 		return new Promise(resolve => {
 			const chats = this.chats.all();
 			return resolve(chats.filter(x => !x.jid.includes('@g.us') && x.count));
 		});
 	}
+	/**
+	 * Gets all chat
+	 */
 	async getAllChats(): Promise<Array<WAChat>> {
 		return new Promise(resolve => {
 			return resolve(this.chats.all());
 		});
 	}
+	/**
+	 * Reply a message
+	 * @param jid the id to send to
+	 * @param text the text overlay
+	 * @param quoted the quoted message obj
+	 * @param options? Extra options
+	 * @param fakeText? fakereply overlay text
+	 */
 	async reply(
 		jid: string,
 		text = '',
@@ -227,6 +281,13 @@ export class Index extends WAConnection {
 			...options,
 		});
 	}
+	/**
+	 * Forward a message
+	 * @param jid the id to send to
+	 * @param message the message obj
+	 * @param forceForward? force the forward
+	 * @param options? Extra options
+	 */
 	async forward(jid: string, message: WAMessage, forceForward = false, options = {}) {
 		const mtype = Object.keys(message.message!)[0]
 		const content = this.generateForwardMessageContent(message, forceForward)
@@ -265,6 +326,13 @@ export class Index extends WAConnection {
 			contextInfo: contextInfo,
 		});
 	}
+	/**
+	 * Wait a message with specific period
+	 * @param obj.sender the target jid
+	 * @param obj.callback enable callback every message from
+	 * @param obj.query the query
+	 * @param timeout timeout in ms
+	 */
 	async waitMessage(
 		obj: waitMessageObj,
 		timeout: number,
